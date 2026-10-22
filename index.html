@@ -283,8 +283,16 @@
             }, 3000);
         });
 
-        // Updated Default Staff Array
+        // Combined Staff Array (Previous names + New names)
         const defaultStaff = [
+            // Previous Names
+            "Patrick Apawudza",
+            "John Njoku",
+            "Ayirebi Wise",
+            "Godwin Horsu",
+            "Godwin Kyekye",
+            "Godfred OK",
+            // New Names
             "Oto Richmond",
             "Amos Adjei Kumi",
             "John Bruce",
@@ -297,12 +305,9 @@
             "Jonathan Adjei Abban"
         ];
 
-        // Retrieve data from localStorage or fallback to defaults
-        let staffList = JSON.parse(localStorage.getItem('motorway_staff'));
-        if (!staffList || staffList.length === 0) {
-            staffList = defaultStaff;
-            localStorage.setItem('motorway_staff', JSON.stringify(staffList));
-        }
+        // Retrieve data from localStorage or fallback to defaults (force sync with combined roster)
+        let staffList = defaultStaff; 
+        localStorage.setItem('motorway_staff', JSON.stringify(staffList));
 
         let attendanceLogs = JSON.parse(localStorage.getItem('motorway_logs')) || [];
 
