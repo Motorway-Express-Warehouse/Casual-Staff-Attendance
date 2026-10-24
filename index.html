@@ -126,6 +126,185 @@
             background: rgba(156, 163, 175, 0.4);
             border-radius: 9999px;
         }
+
+        /* ===== APPLE SEGMENTED CAPSULE SHIFT SWITCHER ===== */
+        .shift-switch {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 4px;
+            border-radius: 9999px;
+            background: rgba(148, 163, 184, 0.22);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .shift-thumb {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            border-radius: 9999px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14), 0 1px 2px rgba(15, 23, 42, 0.1);
+            opacity: 0;
+            transform: translateX(0) scale(0.92);
+            transition:
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease,
+                background 0.3s ease;
+            pointer-events: none;
+        }
+        .shift-switch[data-value="DAY"] .shift-thumb {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        }
+        .shift-switch[data-value="NIGHT"] .shift-thumb {
+            opacity: 1;
+            transform: translateX(100%) scale(1);
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        }
+        .shift-option {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: color 0.25s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .shift-option:active {
+            transform: scale(0.96);
+        }
+        .shift-option:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        .shift-option svg {
+            width: 16px;
+            height: 16px;
+        }
+        .shift-option[data-shift="DAY"].active {
+            color: #b45309;
+        }
+        .shift-option[data-shift="NIGHT"].active {
+            color: #4338ca;
+        }
+
+        /* ===== SUCCESS OVERLAY (CHECKMARK + BOUNCE) ===== */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .success-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .success-card {
+            background: rgba(255, 255, 255, 0.93);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+            padding: 28px 40px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+            transform: scale(0.8);
+        }
+        .success-overlay.show .success-card {
+            animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes successBounce {
+            0%   { transform: scale(0.7); opacity: 0; }
+            60%  { transform: scale(1.06); opacity: 1; }
+            80%  { transform: scale(0.98); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+        }
+        .success-check {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+        }
+        .success-overlay.show .success-circle {
+            animation: drawStroke 0.6s 0.15s ease-out forwards;
+        }
+        .success-overlay.show .success-check {
+            animation: drawStroke 0.35s 0.6s ease-out forwards;
+        }
+        @keyframes drawStroke {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* ===== APPLE SEGMENTED NAV (CHECK-IN / ADMIN) ===== */
+        .nav-seg {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 4px;
+            border-radius: 9999px;
+            background: rgba(148, 163, 184, 0.22);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .nav-thumb {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            border-radius: 9999px;
+            background: #ffffff;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.14), 0 1px 2px rgba(15, 23, 42, 0.1);
+            transform: translateX(0);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .nav-seg[data-value="admin"] .nav-thumb {
+            transform: translateX(100%);
+        }
+        .nav-opt {
+            position: relative;
+            z-index: 1;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 9999px;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.25s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nav-opt:active { transform: scale(0.96); }
+        .nav-opt.active { color: #2563eb; }
+        .nav-opt:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50/40 min-h-screen text-slate-800 antialiased relative selection:bg-blue-500 selection:text-white pb-12">
@@ -194,13 +373,10 @@
                     </div>
                     
                     <!-- View Toggle Pill Segment Control -->
-                    <div class="bg-slate-200/60 p-1 rounded-2xl flex items-center border border-slate-300/40">
-                        <button onclick="switchView('checkin')" id="navCheckin" class="px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 bg-white text-blue-600 shadow-sm">
-                            Check-In
-                        </button>
-                        <button onclick="checkAdminAccess()" id="navAdmin" class="px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900">
-                            Admin
-                        </button>
+                    <div id="navSwitch" class="nav-seg" data-value="checkin" role="tablist">
+                        <div class="nav-thumb"></div>
+                        <button onclick="switchView('checkin')" id="navCheckin" class="nav-opt active" role="tab">Check-In</button>
+                        <button onclick="checkAdminAccess()" id="navAdmin" class="nav-opt" role="tab">Admin</button>
                     </div>
                 </div>
             </div>
@@ -241,18 +417,21 @@
                         </div>
                     </div>
 
-                    <!-- Shift Dropdown -->
+                    <!-- Shift: Apple Segmented Capsule Switcher -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2" for="shiftSelect">Work Shift</label>
-                        <div class="relative">
-                            <select id="shiftSelect" required class="input-apple w-full p-3.5 border border-slate-200/90 rounded-2xl bg-white/90 text-slate-800 text-sm font-medium focus:outline-none appearance-none shadow-sm cursor-pointer">
-                                <option value="">-- Select Shift --</option>
-                                <option value="DAY"> DAY </option>
-                                <option value="NIGHT"> NIGHT </option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Work Shift</label>
+                        <!-- Hidden input keeps existing logic working (id="shiftSelect") -->
+                        <input type="hidden" id="shiftSelect" value="">
+                        <div id="shiftSwitch" class="shift-switch" data-value="" role="radiogroup" aria-label="Work Shift">
+                            <div class="shift-thumb"></div>
+                            <button type="button" class="shift-option" data-shift="DAY" role="radio" aria-checked="false" onclick="setShift('DAY')">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"></path></svg>
+                                Day Shift
+                            </button>
+                            <button type="button" class="shift-option" data-shift="NIGHT" role="radio" aria-checked="false" onclick="setShift('NIGHT')">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+                                Night Shift
+                            </button>
                         </div>
                     </div>
 
@@ -319,6 +498,10 @@
             <!-- Staff Roster Card -->
             <div class="apple-glass-card rounded-3xl p-6 shadow-sm">
                 <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">Staff Roster Management</h3>
+                <div class="relative mb-3">
+                    <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
+                    <input type="search" id="staffSearch" oninput="renderAdminData()" placeholder="Search staff roster..." class="input-apple w-full border border-slate-200/90 pl-10 pr-3 py-2.5 rounded-2xl text-xs bg-slate-50/80 focus:outline-none">
+                </div>
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="newStaffInput" placeholder="Enter full name..." class="input-apple flex-1 border border-slate-200/90 p-3 rounded-2xl text-xs bg-white focus:outline-none">
                     <button onclick="addStaff()" class="btn-apple bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-3 rounded-2xl shadow-sm">
@@ -355,6 +538,10 @@
             <div class="apple-glass-card rounded-3xl p-6 shadow-sm">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">All Check-In Activity (<span id="totalLogsCount">0</span>)</h3>
+                    <div class="relative">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
+                        <input type="search" id="logSearch" oninput="renderAdminData()" placeholder="Search name, shift, date..." class="input-apple w-40 md:w-60 border border-slate-200/90 pl-9 pr-3 py-2 rounded-2xl text-xs bg-slate-50/80 focus:outline-none">
+                    </div>
                 </div>
                 <div class="overflow-x-auto max-h-64 border border-slate-200/80 rounded-2xl bg-white/50">
                     <table class="w-full text-left text-xs">
@@ -374,6 +561,19 @@
             </div>
         </div>
     </main>
+
+    <!-- SUCCESS OVERLAY -->
+    <div id="successOverlay" class="success-overlay" onclick="hideSuccessOverlay()">
+        <div class="success-card">
+            <svg class="mx-auto mb-3" width="84" height="84" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="success-circle" cx="26" cy="26" r="25" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"></circle>
+                <path class="success-check" d="M14 27 l8 8 l16 -16" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <div class="text-lg font-extrabold text-slate-900">Checked In</div>
+            <div id="successName" class="text-sm font-semibold text-slate-600 mt-1"></div>
+            <div id="successShift" class="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mt-1"></div>
+        </div>
+    </div>
 
     <script>
         // Google Sheet Web App URL
@@ -434,6 +634,18 @@
 
         // Set default date picker value to today
         document.getElementById('attendanceDate').valueAsDate = new Date();
+
+        // ===== Segmented Capsule Shift Switcher =====
+        function setShift(value) {
+            const sw = document.getElementById('shiftSwitch');
+            document.getElementById('shiftSelect').value = value;
+            sw.dataset.value = value;
+            sw.querySelectorAll('.shift-option').forEach(btn => {
+                const active = btn.dataset.shift === value;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-checked', active ? 'true' : 'false');
+            });
+        }
 
         // Helper function to extract Day Name from Date String
         function getDayOfWeekName(dateString) {
@@ -506,7 +718,14 @@
         populateDropdown();
 
         // Apple-style Smooth View Switcher
+        function setNav(view) {
+            document.getElementById('navSwitch').dataset.value = view;
+            document.getElementById('navCheckin').classList.toggle('active', view === 'checkin');
+            document.getElementById('navAdmin').classList.toggle('active', view === 'admin');
+        }
+
         function switchView(view) {
+            setNav(view);
             const checkin = document.getElementById('checkinView');
             const admin = document.getElementById('adminView');
 
@@ -514,16 +733,12 @@
                 admin.classList.replace('view-visible', 'view-hidden');
                 setTimeout(() => {
                     checkin.classList.replace('view-hidden', 'view-visible');
-                    document.getElementById('navCheckin').className = "px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 bg-white text-blue-600 shadow-sm";
-                    document.getElementById('navAdmin').className = "px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900";
                     initSignaturePad();
                 }, 150);
             } else {
                 checkin.classList.replace('view-visible', 'view-hidden');
                 setTimeout(() => {
                     admin.classList.replace('view-hidden', 'view-visible');
-                    document.getElementById('navAdmin').className = "px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 bg-white text-blue-600 shadow-sm";
-                    document.getElementById('navCheckin').className = "px-4 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900";
                     renderAdminData();
                 }, 150);
             }
@@ -574,9 +789,74 @@
             }
         }
 
+        // ===== Apple Pay-style success chime (Web Audio API) =====
+        let audioCtx = null;
+
+        // Must run inside a user gesture (the submit tap) so the browser allows sound later
+        function unlockAudio() {
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return;
+                if (!audioCtx) audioCtx = new AC();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch (err) { /* audio unavailable */ }
+        }
+
+        function playTone(freq, start, duration, volume) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(start);
+            osc.stop(start + duration + 0.05);
+        }
+
+        function playSuccessChime() {
+            if (!audioCtx) return;
+            try {
+                const t = audioCtx.currentTime + 0.02;
+                // Two ascending notes (B5 -> E6) with a soft octave shimmer
+                playTone(987.77, t, 0.55, 0.16);
+                playTone(1975.5, t, 0.35, 0.04);
+                playTone(1318.51, t + 0.11, 0.8, 0.18);
+                playTone(2637.0, t + 0.11, 0.5, 0.045);
+            } catch (err) { /* ignore */ }
+        }
+
+        // ===== Success overlay (checkmark + bounce) =====
+        let successTimer = null;
+
+        function showSuccessOverlay(name, shift) {
+            const overlay = document.getElementById('successOverlay');
+            document.getElementById('successName').textContent = name;
+            document.getElementById('successShift').textContent = shift ? `${shift} SHIFT` : '';
+            overlay.classList.remove('show');
+            void overlay.offsetWidth; // restart animations
+            overlay.classList.add('show');
+            clearTimeout(successTimer);
+            successTimer = setTimeout(hideSuccessOverlay, 2000);
+        }
+
+        function hideSuccessOverlay() {
+            clearTimeout(successTimer);
+            document.getElementById('successOverlay').classList.remove('show');
+        }
+
+        function triggerSuccessFeedback(name, shift) {
+            showSuccessOverlay(name, shift);
+            playSuccessChime();
+            if (navigator.vibrate) navigator.vibrate([12, 40, 18]); // light haptic on supported phones
+        }
+
         // Handle Form Submission & Google Sheets Sync
         async function handleCheckIn(e) {
             e.preventDefault();
+            unlockAudio();
             const name = document.getElementById('staffSelect').value;
             const shift = document.getElementById('shiftSelect').value;
             const date = document.getElementById('attendanceDate').value;
@@ -627,6 +907,7 @@
                 });
 
                 showAlert(`Thank you, ${name}. Checked in & synced to Google Sheet!`, "ok");
+                triggerSuccessFeedback(name, shift);
             } catch (err) {
                 console.error("Sheet sync error:", err);
                 showAlert(`Checked in locally, but Google Sheet sync failed.`, "err");
@@ -634,6 +915,7 @@
 
             // Reset form
             document.getElementById('checkinForm').reset();
+            setShift('');
             document.getElementById('attendanceDate').valueAsDate = new Date();
             updateSelectedDayDisplay();
             signaturePad.clear();
@@ -680,18 +962,37 @@
             }
         }
 
+        // Apple-style empty states
+        const EMPTY_ICONS = {
+            users: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.13a4 4 0 00-6 0M12 12a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm7 7a6 6 0 00-14 0"></path></svg>',
+            search: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>',
+            clipboard: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 8l2 2 4-4"></path></svg>'
+        };
+
+        function emptyState(cols, icon, title, subtitle) {
+            return `<tr><td colspan="${cols}" class="py-10 px-4 text-center">
+                <div class="mx-auto mb-3 w-14 h-14 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-400">${EMPTY_ICONS[icon]}</div>
+                <div class="text-sm font-semibold text-slate-700 tracking-tight">${title}</div>
+                <div class="text-xs text-slate-400 mt-1">${subtitle}</div>
+            </td></tr>`;
+        }
+
         // Render Admin Panel Data
         function renderAdminData() {
             // Roster Table
             const staffTbody = document.getElementById('adminStaffTable');
-            staffTbody.innerHTML = staffList.map(s => `
+            const staffQ = (document.getElementById('staffSearch')?.value || '').trim().toLowerCase();
+            const visibleStaff = staffList.filter(s => s.toLowerCase().includes(staffQ));
+            staffTbody.innerHTML = visibleStaff.map(s => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
                     <td class="p-2.5 font-medium text-slate-800">${s}</td>
                     <td class="p-2.5 text-right">
                         <button onclick="removeStaff('${s}')" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
                     </td>
                 </tr>
-            `).join('') || `<tr><td class="p-3 text-slate-400">No staff listed.</td></tr>`;
+            `).join('') || (staffQ
+                ? emptyState(2, 'search', 'No Results', 'No staff match your search.')
+                : emptyState(2, 'users', 'No Staff Yet', 'Add a name above to build your roster.'));
 
             // Summary Stats
             let stats = {};
@@ -721,7 +1022,14 @@
 
             // Logs Table
             const logsTbody = document.getElementById('logsTableBody');
-            logsTbody.innerHTML = attendanceLogs.map(r => {
+            const logQ = (document.getElementById('logSearch')?.value || '').trim().toLowerCase();
+            const visibleLogs = attendanceLogs.filter(r =>
+                !logQ || [r.name, r.dayOfWeek, r.shift, r.date].join(' ').toLowerCase().includes(logQ)
+            );
+            document.getElementById('totalLogsCount').textContent = logQ
+                ? `${visibleLogs.length} of ${attendanceLogs.length}`
+                : attendanceLogs.length;
+            logsTbody.innerHTML = visibleLogs.map(r => {
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
                 const sigDisplay = r.signature ? `<img src="${r.signature}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">` : '<span class="text-[10px] text-slate-400">Imported</span>';
                 return `
@@ -738,7 +1046,9 @@
                         <td class="p-2.5">${sigDisplay}</td>
                     </tr>
                 `;
-            }).join('') || `<tr><td colspan="6" class="p-4 text-slate-400 text-center">No attendance records found.</td></tr>`;
+            }).join('') || (logQ
+                ? emptyState(6, 'search', 'No Results', 'No check-ins match your search.')
+                : emptyState(6, 'clipboard', 'No Check-Ins Yet', 'Attendance records will appear here.'));
         }
 
         // CSV Exporter
