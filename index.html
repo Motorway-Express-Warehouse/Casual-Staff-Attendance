@@ -369,7 +369,7 @@
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
                     <!-- Date Input -->
                     <div class="relative">
-                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple bg-white/80 border border-slate-200 text-slate-800 font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer">
+                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple bg-white/80 border border-slate-200 text-slate-800 font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                     </div>
                     
                     <!-- View Toggle Pill Segment Control -->
@@ -620,20 +620,125 @@
             "Richmond Adzoda"
         ];
 
-        // Force roster sync
-        let staffList = defaultStaff; 
+        function loadJSON(key, fallback) {
+            try {
+                const v = JSON.parse(localStorage.getItem(key));
+                return Array.isArray(v) ? v : fallback;
+            } catch (err) {
+                return fallback;
+            }
+        }
+
+        // Roster: saved list + any names newly added to defaultStaff in code (unless an admin removed them)
+        let removedStaff = loadJSON('motorway_removed_staff', []);
+        let staffList = loadJSON('motorway_staff', []);
+        defaultStaff.forEach(n => {
+            if (!staffList.includes(n) && !removedStaff.includes(n)) staffList.push(n);
+        });
+        staffList.sort((a, b) => a.localeCompare(b));
         localStorage.setItem('motorway_staff', JSON.stringify(staffList));
 
-        let attendanceLogs = JSON.parse(localStorage.getItem('motorway_logs')) || [];
+        let attendanceLogs = loadJSON('motorway_logs', []);
 
-        // Admin Security PINs
-        let adminPin = localStorage.getItem('motorway_admin_pin') || "1234";
-        const MASTER_RECOVERY_CODE = "motorway2026";
+        function saveLogs() {
+            try {
+                localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+            } catch (err) {
+                console.warn('Local log storage is full or unavailable:', err);
+            }
+        }
+
+
+        // SHA-256 (so the PIN and recovery code are never stored or shipped in plain text)
+        function sha256(ascii) {
+            function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+            const maxWord = Math.pow(2, 32);
+            let result = '';
+            const words = [];
+            const asciiBitLength = ascii.length * 8;
+            let hash = sha256.h = sha256.h || [];
+            const k = sha256.k = sha256.k || [];
+            let primeCounter = k.length;
+            const isComposite = {};
+            for (let candidate = 2; primeCounter < 64; candidate++) {
+                if (!isComposite[candidate]) {
+                    for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+                    hash[primeCounter] = (Math.pow(candidate, 0.5) * maxWord) | 0;
+                    k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+                }
+            }
+            ascii += '\x80';
+            while (ascii.length % 64 - 56) ascii += '\x00';
+            for (let i = 0; i < ascii.length; i++) {
+                const j = ascii.charCodeAt(i);
+                if (j >> 8) return null;
+                words[i >> 2] |= j << ((3 - i) % 4) * 8;
+            }
+            words[words.length] = ((asciiBitLength / maxWord) | 0);
+            words[words.length] = (asciiBitLength);
+            for (let j = 0; j < words.length;) {
+                const w = words.slice(j, j += 16);
+                const oldHash = hash;
+                hash = hash.slice(0, 8);
+                for (let i = 0; i < 64; i++) {
+                    const w15 = w[i - 15], w2 = w[i - 2];
+                    const a = hash[0], e = hash[4];
+                    const temp1 = hash[7]
+                        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+                        + ((e & hash[5]) ^ ((~e) & hash[6]))
+                        + k[i]
+                        + (w[i] = (i < 16) ? w[i] : (
+                            w[i - 16]
+                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                            + w[i - 7]
+                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+                        ) | 0);
+                    const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+                        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+                    hash = [(temp1 + temp2) | 0].concat(hash);
+                    hash[4] = (hash[4] + temp1) | 0;
+                }
+                for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+            }
+            for (let i = 0; i < 8; i++) {
+                for (let j = 3; j + 1; j--) {
+                    const b = (hash[i] >> (j * 8)) & 255;
+                    result += ((b < 16) ? 0 : '') + b.toString(16);
+                }
+            }
+            return result;
+        }
+
+        // Admin Security: only salted hashes are stored / shipped
+        const PIN_SALT = "motorway-v1:";
+        const MASTER_RECOVERY_HASH = "00bbc61368de7222985ee87ac2cce0a54271a61b2212faab70e003d6df81603e";
+
+        function hashPin(value) {
+            return sha256(unescape(encodeURIComponent(PIN_SALT + value)));
+        }
+
+        let adminPinHash = localStorage.getItem('motorway_admin_pin_hash') || null;
+
+        // Migrate any older plain-text PIN to a hash, then delete the plain copy
+        (function migrateLegacyPin() {
+            const legacy = localStorage.getItem('motorway_admin_pin');
+            if (legacy) {
+                if (!adminPinHash) {
+                    adminPinHash = hashPin(legacy);
+                    localStorage.setItem('motorway_admin_pin_hash', adminPinHash);
+                }
+                localStorage.removeItem('motorway_admin_pin');
+            }
+        })();
+
+        let failedAttempts = 0;
+        let lockUntil = Number(localStorage.getItem('motorway_lock_until')) || 0;
 
         let signaturePad = null;
+        let adminUnlocked = false;
 
         // Set default date picker value to today
-        document.getElementById('attendanceDate').valueAsDate = new Date();
+        document.getElementById('attendanceDate').value = todayStr();
 
         // ===== Segmented Capsule Shift Switcher =====
         function setShift(value) {
@@ -645,6 +750,22 @@
                 btn.classList.toggle('active', active);
                 btn.setAttribute('aria-checked', active ? 'true' : 'false');
             });
+        }
+
+        // Today's date in the device's local time (YYYY-MM-DD)
+        function todayStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        // Staff can only check in for today; the date picker unlocks only inside the Admin session
+        function applyDateLock() {
+            const el = document.getElementById('attendanceDate');
+            el.disabled = !adminUnlocked;
+            if (!adminUnlocked && el.value !== todayStr()) {
+                el.value = todayStr();
+                updateSelectedDayDisplay();
+            }
         }
 
         // Helper function to extract Day Name from Date String
@@ -677,6 +798,7 @@
         function updateClock() {
             const now = new Date();
             document.getElementById('liveClock').textContent = now.toLocaleTimeString();
+            applyDateLock();
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -726,6 +848,8 @@
 
         function switchView(view) {
             setNav(view);
+            adminUnlocked = (view === 'admin');
+            applyDateLock();
             const checkin = document.getElementById('checkinView');
             const admin = document.getElementById('adminView');
 
@@ -745,48 +869,105 @@
         }
 
         // Secure PIN Access Control
-        function checkAdminAccess() {
-            let pin = prompt("Enter Admin PIN:");
-            if (pin === null) return;
+        function isLocked() {
+            const remaining = lockUntil - Date.now();
+            if (remaining > 0) {
+                alert(`Too many failed attempts. Try again in ${Math.ceil(remaining / 1000)} seconds.`);
+                return true;
+            }
+            return false;
+        }
 
-            if (pin === adminPin) {
-                switchView('admin');
-            } else {
-                let choice = confirm("Incorrect PIN!\n\nClick 'OK' to reset PIN using Recovery Code, or 'Cancel' to try again.");
-                if (choice) {
-                    let recoveryInput = prompt("Enter Master Recovery Code:");
-                    if (recoveryInput === MASTER_RECOVERY_CODE) {
-                        let newPin = prompt("Enter your NEW Admin PIN:");
-                        if (newPin && newPin.trim().length > 0) {
-                            adminPin = newPin.trim();
-                            localStorage.setItem('motorway_admin_pin', adminPin);
-                            alert("Admin PIN successfully updated!");
-                            switchView('admin');
-                        } else {
-                            alert("PIN change cancelled.");
-                        }
-                    } else if (recoveryInput !== null) {
-                        alert("Incorrect Recovery Code!");
-                    }
-                }
+        function registerFail() {
+            failedAttempts++;
+            if (failedAttempts >= 5) {
+                failedAttempts = 0;
+                lockUntil = Date.now() + 60000;
+                localStorage.setItem('motorway_lock_until', String(lockUntil));
             }
         }
 
-        // Change Admin PIN Prompt
-        function changePinPrompt() {
-            let current = prompt("Enter current Admin PIN:");
-            if (current === adminPin) {
-                let freshPin = prompt("Enter new Admin PIN:");
-                if (freshPin && freshPin.trim().length > 0) {
-                    adminPin = freshPin.trim();
-                    localStorage.setItem('motorway_admin_pin', adminPin);
-                    alert("Admin PIN updated successfully!");
-                } else {
-                    alert("Operation cancelled.");
+        function setAdminPin(pin) {
+            adminPinHash = hashPin(pin);
+            localStorage.setItem('motorway_admin_pin_hash', adminPinHash);
+        }
+
+        function isValidNewPin(pin) {
+            return !!pin && pin.trim().length >= 4;
+        }
+
+        function checkAdminAccess() {
+            if (isLocked()) return;
+
+            // First use on this device: create a PIN (no default PIN exists)
+            if (!adminPinHash) {
+                const created = prompt("No Admin PIN is set yet.\n\nCreate a new Admin PIN (at least 4 characters):");
+                if (created === null) return;
+                if (!isValidNewPin(created)) {
+                    alert("PIN must be at least 4 characters.");
+                    return;
                 }
-            } else if (current !== null) {
-                alert("Incorrect PIN.");
+                setAdminPin(created.trim());
+                alert("Admin PIN created!");
+                switchView('admin');
+                return;
             }
+
+            const pin = prompt("Enter Admin PIN:");
+            if (pin === null) return;
+
+            if (hashPin(pin.trim()) === adminPinHash) {
+                failedAttempts = 0;
+                switchView('admin');
+                return;
+            }
+
+            registerFail();
+            const choice = confirm("Incorrect PIN!\n\nClick 'OK' to reset PIN using Recovery Code, or 'Cancel' to try again.");
+            if (!choice) return;
+            if (isLocked()) return;
+
+            const recoveryInput = prompt("Enter Master Recovery Code:");
+            if (recoveryInput === null) return;
+            if (hashPin(recoveryInput.trim()) !== MASTER_RECOVERY_HASH) {
+                registerFail();
+                alert("Incorrect Recovery Code!");
+                return;
+            }
+
+            const newPin = prompt("Enter your NEW Admin PIN (at least 4 characters):");
+            if (newPin === null) return;
+            if (!isValidNewPin(newPin)) {
+                alert("PIN must be at least 4 characters. Change cancelled.");
+                return;
+            }
+            setAdminPin(newPin.trim());
+            failedAttempts = 0;
+            alert("Admin PIN successfully updated!");
+            switchView('admin');
+        }
+
+        function changePinPrompt() {
+            if (isLocked()) return;
+            if (!adminPinHash) {
+                alert("No Admin PIN is set yet.");
+                return;
+            }
+            const current = prompt("Enter current Admin PIN:");
+            if (current === null) return;
+            if (hashPin(current.trim()) !== adminPinHash) {
+                registerFail();
+                alert("Incorrect PIN.");
+                return;
+            }
+            const fresh = prompt("Enter new Admin PIN (at least 4 characters):");
+            if (fresh === null) return;
+            if (!isValidNewPin(fresh)) {
+                alert("PIN must be at least 4 characters. Operation cancelled.");
+                return;
+            }
+            setAdminPin(fresh.trim());
+            alert("Admin PIN updated successfully!");
         }
 
         // ===== Apple Pay-style success chime =====
@@ -930,6 +1111,15 @@
                 showAlert("Please choose your shift.", "err");
                 return;
             }
+            if (!adminUnlocked && date !== todayStr()) {
+                applyDateLock();
+                showAlert("Check-in is only allowed for today's date.", "err");
+                return;
+            }
+            if (attendanceLogs.some(l => l.name === name && l.date === date && l.shift === shift)) {
+                showAlert(`${name} has already checked in for the ${shift} shift on ${date}.`, "err");
+                return;
+            }
             if (signaturePad.isEmpty()) {
                 showAlert("Please sign in the box provided.", "err");
                 return;
@@ -951,7 +1141,7 @@
 
             // Save locally backup
             attendanceLogs.unshift(newLog);
-            localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+            saveLogs();
 
             // Send payload to Google Sheets
             try {
@@ -976,7 +1166,7 @@
             // Reset form
             document.getElementById('checkinForm').reset();
             setShift('');
-            document.getElementById('attendanceDate').valueAsDate = new Date();
+            document.getElementById('attendanceDate').value = todayStr();
             updateSelectedDayDisplay();
             signaturePad.clear();
         }
@@ -988,7 +1178,7 @@
                 : 'bg-rose-50 text-rose-800 border-rose-200';
             box.innerHTML = `<div class="p-3.5 mb-5 border rounded-2xl font-medium text-xs shadow-sm flex items-center gap-2 ${cls}">
                 <div class="w-2 h-2 rounded-full ${type === 'ok' ? 'bg-emerald-500' : 'bg-rose-500'}"></div>
-                ${msg}
+                ${esc(msg)}
             </div>`;
             setTimeout(() => { box.innerHTML = ''; }, 4500);
         }
@@ -1005,6 +1195,8 @@
             }
 
             staffList.push(val);
+            removedStaff = removedStaff.filter(n => n.toLowerCase() !== val.toLowerCase());
+            localStorage.setItem('motorway_removed_staff', JSON.stringify(removedStaff));
             staffList.sort((a, b) => a.localeCompare(b));
             localStorage.setItem('motorway_staff', JSON.stringify(staffList));
             input.value = '';
@@ -1016,6 +1208,8 @@
         function removeStaff(name) {
             if (confirm(`Remove ${name} from roster?`)) {
                 staffList = staffList.filter(s => s !== name);
+                if (!removedStaff.includes(name)) removedStaff.push(name);
+                localStorage.setItem('motorway_removed_staff', JSON.stringify(removedStaff));
                 localStorage.setItem('motorway_staff', JSON.stringify(staffList));
                 populateDropdown();
                 renderAdminData();
@@ -1038,6 +1232,11 @@
         }
 
         // Render Admin Panel Data
+        // Escape text before inserting into HTML (blocks broken markup / injection)
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function renderAdminData() {
             // Roster Table
             const staffTbody = document.getElementById('adminStaffTable');
@@ -1045,9 +1244,9 @@
             const visibleStaff = staffList.filter(s => s.toLowerCase().includes(staffQ));
             staffTbody.innerHTML = visibleStaff.map(s => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                    <td class="p-2.5 font-medium text-slate-800">${s}</td>
+                    <td class="p-2.5 font-medium text-slate-800">${esc(s)}</td>
                     <td class="p-2.5 text-right">
-                        <button onclick="removeStaff('${s}')" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
+                        <button data-name="${esc(s)}" onclick="removeStaff(this.dataset.name)" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
                     </td>
                 </tr>
             `).join('') || (staffQ
@@ -1055,7 +1254,7 @@
                 : emptyState(2, 'users', 'No Staff Yet', 'Add a name above to build your roster.'));
 
             // Summary Stats
-            let stats = {};
+            const stats = Object.create(null);
             staffList.forEach(s => stats[s] = { dayShifts: 0, nightShifts: 0, uniqueDays: new Set(), total: 0 });
 
             attendanceLogs.forEach(log => {
@@ -1069,16 +1268,13 @@
             const summaryTbody = document.getElementById('summaryTableBody');
             summaryTbody.innerHTML = Object.keys(stats).map(name => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                    <td class="p-2.5 font-medium text-slate-800">${name}</td>
+                    <td class="p-2.5 font-medium text-slate-800">${esc(name)}</td>
                     <td class="p-2.5 text-amber-600 font-semibold">${stats[name].dayShifts}</td>
                     <td class="p-2.5 text-indigo-600 font-semibold">${stats[name].nightShifts}</td>
                     <td class="p-2.5 text-blue-600 font-semibold">${stats[name].uniqueDays.size}</td>
                     <td class="p-2.5 font-bold text-slate-900">${stats[name].total}</td>
                 </tr>
             `).join('');
-
-            // Total logs counter update
-            document.getElementById('totalLogsCount').textContent = attendanceLogs.length;
 
             // Logs Table
             const logsTbody = document.getElementById('logsTableBody');
@@ -1091,24 +1287,33 @@
                 : attendanceLogs.length;
             logsTbody.innerHTML = visibleLogs.map(r => {
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
-                const sigDisplay = r.signature ? `<img src="${r.signature}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">` : '<span class="text-[10px] text-slate-400">Imported</span>';
+                const sigDisplay = (r.signature && /^data:image\//.test(r.signature))
+                    ? `<img src="${esc(r.signature)}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">`
+                    : '<span class="text-[10px] text-slate-400">Imported</span>';
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                        <td class="p-2.5 font-medium text-slate-800">${r.name}</td>
-                        <td class="p-2.5 font-semibold text-slate-600">${dayName}</td>
+                        <td class="p-2.5 font-medium text-slate-800">${esc(r.name)}</td>
+                        <td class="p-2.5 font-semibold text-slate-600">${esc(dayName)}</td>
                         <td class="p-2.5">
                             <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${r.shift === 'DAY' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'}">
-                                ${r.shift || 'DAY'}
+                                ${esc(r.shift || 'DAY')}
                             </span>
                         </td>
-                        <td class="p-2.5 text-slate-600">${r.date}</td>
-                        <td class="p-2.5 text-slate-600">${r.time}</td>
+                        <td class="p-2.5 text-slate-600">${esc(r.date)}</td>
+                        <td class="p-2.5 text-slate-600">${esc(r.time)}</td>
                         <td class="p-2.5">${sigDisplay}</td>
                     </tr>
                 `;
             }).join('') || (logQ
                 ? emptyState(6, 'search', 'No Results', 'No check-ins match your search.')
                 : emptyState(6, 'clipboard', 'No Check-Ins Yet', 'Attendance records will appear here.'));
+        }
+
+        // CSV cell: always quoted; cells starting with = + - @ are neutralised so Excel won't run them
+        function csvCell(v) {
+            let t = String(v ?? '');
+            if (/^[=+\-@]/.test(t)) t = "'" + t;
+            return '"' + t.replace(/"/g, '""') + '"';
         }
 
         // CSV Exporter
@@ -1121,7 +1326,7 @@
             let csv = "Name,Day of Week,Shift,Date,Time\n";
             attendanceLogs.forEach(r => {
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
-                csv += `"${r.name}","${dayName}","${r.shift || 'DAY'}","${r.date}","${r.time}"\n`;
+                csv += [r.name, dayName, r.shift || 'DAY', r.date, r.time].map(csvCell).join(',') + '\n';
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1173,7 +1378,7 @@
                     }
                 }
 
-                localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+                saveLogs();
                 renderAdminData();
                 alert(`Successfully imported ${addedCount} new records!`);
                 e.target.value = '';
@@ -1187,7 +1392,7 @@
                 let doubleCheck = prompt("Type 'DELETE' to confirm clearing all data:");
                 if (doubleCheck === "DELETE") {
                     attendanceLogs = [];
-                    localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+                    saveLogs();
                     renderAdminData();
                     alert("Log archive cleared.");
                 }
