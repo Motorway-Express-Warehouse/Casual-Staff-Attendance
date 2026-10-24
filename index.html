@@ -401,6 +401,8 @@
                     </div>
                 </div>
 
+                <button type="button" id="syncBadge" onclick="flushQueue()" class="hidden w-full mb-4 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-center"></button>
+
                 <div id="alertBox"></div>
 
                 <form id="checkinForm" onsubmit="handleCheckIn(event)" class="space-y-5">
@@ -641,11 +643,13 @@
         let attendanceLogs = loadJSON('motorway_logs', []);
 
         function saveLogs() {
-            try {
-                localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
-            } catch (err) {
-                console.warn('Local log storage is full or unavailable:', err);
-            }
+            const attempt = () => localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+            try { attempt(); return; } catch (err) { /* storage full: shrink below */ }
+            // Keep signature images only on the newest 50 logs (the Google Sheet holds the full record)
+            attendanceLogs.forEach((l, i) => { if (i >= 50) l.signature = ''; });
+            try { attempt(); return; } catch (err) { /* still full */ }
+            attendanceLogs.forEach(l => { l.signature = ''; });
+            try { attempt(); } catch (err) { console.warn('Local log storage is unavailable:', err); }
         }
 
 
@@ -750,12 +754,27 @@
                 btn.classList.toggle('active', active);
                 btn.setAttribute('aria-checked', active ? 'true' : 'false');
             });
+            updateSelectedDayDisplay();
         }
 
         // Today's date in the device's local time (YYYY-MM-DD)
-        function todayStr() {
-            const d = new Date();
+        function fmtDate(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function todayStr() {
+            return fmtDate(new Date());
+        }
+
+        // A NIGHT check-in before this hour belongs to the previous day's shift
+        const NIGHT_SHIFT_CUTOFF_HOUR = 6;
+
+        function getEffectiveShiftDate(dateVal, shift) {
+            if (!adminUnlocked && shift === 'NIGHT' && dateVal === todayStr() && new Date().getHours() < NIGHT_SHIFT_CUTOFF_HOUR) {
+                const [y, m, d] = dateVal.split('-').map(Number);
+                return fmtDate(new Date(y, m - 1, d - 1));
+            }
+            return dateVal;
         }
 
         // Staff can only check in for today; the date picker unlocks only inside the Admin session
@@ -782,8 +801,10 @@
         // Update day indicator and date header whenever date input changes
         function updateSelectedDayDisplay() {
             const dateVal = document.getElementById('attendanceDate').value;
-            const dayName = getDayOfWeekName(dateVal);
-            document.getElementById('autoDayBadge').textContent = dayName;
+            const shiftVal = document.getElementById('shiftSelect').value;
+            const shiftDate = getEffectiveShiftDate(dateVal, shiftVal);
+            const dayName = getDayOfWeekName(shiftDate);
+            document.getElementById('autoDayBadge').textContent = shiftDate !== dateVal ? `${dayName} (night shift)` : dayName;
 
             const parts = dateVal.split('-');
             let formattedDateStr = dateVal;
@@ -799,6 +820,7 @@
             const now = new Date();
             document.getElementById('liveClock').textContent = now.toLocaleTimeString();
             applyDateLock();
+            updateSelectedDayDisplay();
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -849,6 +871,7 @@
         function switchView(view) {
             setNav(view);
             adminUnlocked = (view === 'admin');
+            if (view === 'admin') lastAdminActivity = Date.now();
             applyDateLock();
             const checkin = document.getElementById('checkinView');
             const admin = document.getElementById('adminView');
@@ -1072,10 +1095,10 @@
         // ===== Success overlay (checkmark + bounce) =====
         let successTimer = null;
 
-        function showSuccessOverlay(name, shift) {
+        function showSuccessOverlay(name, shift, pending) {
             const overlay = document.getElementById('successOverlay');
             document.getElementById('successName').textContent = name;
-            document.getElementById('successShift').textContent = shift ? `${shift} SHIFT` : '';
+            document.getElementById('successShift').textContent = (shift ? `${shift} SHIFT` : '') + (pending ? ' \u00b7 SYNC PENDING' : '');
             overlay.classList.remove('show');
             void overlay.offsetWidth; // restart animations
             overlay.classList.add('show');
@@ -1088,11 +1111,108 @@
             document.getElementById('successOverlay').classList.remove('show');
         }
 
-        function triggerSuccessFeedback(name, shift) {
-            showSuccessOverlay(name, shift);
+        function triggerSuccessFeedback(name, shift, pending) {
+            showSuccessOverlay(name, shift, pending);
             playSuccessChime();
             if (navigator.vibrate) navigator.vibrate([12, 40, 18]); // light haptic on supported phones
         }
+
+        // ===== Compact signature (much smaller than the raw canvas, still PNG) =====
+        function getCompactSignature() {
+            const src = document.getElementById('pad');
+            const scale = Math.min(1, 400 / src.width);
+            const c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(src.width * scale));
+            c.height = Math.max(1, Math.round(src.height * scale));
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(src, 0, 0, c.width, c.height);
+            return c.toDataURL('image/png');
+        }
+
+        // ===== Offline retry queue =====
+        const SYNC_QUEUE_KEY = 'motorway_sync_queue';
+        let syncQueue = loadJSON(SYNC_QUEUE_KEY, []);
+        let syncing = false;
+
+        function saveSyncQueue() {
+            try {
+                localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(syncQueue));
+            } catch (err) {
+                console.warn('Could not persist sync queue:', err);
+            }
+            updateSyncBadge();
+        }
+
+        function enqueueSync(log) {
+            if (!syncQueue.some(q => q.id === log.id)) syncQueue.push(log);
+            saveSyncQueue();
+        }
+
+        async function sendToSheet(log) {
+            if (navigator.onLine === false) throw new Error('offline');
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 15000);
+            try {
+                await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(log),
+                    signal: ctrl.signal
+                });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function flushQueue() {
+            if (syncing || syncQueue.length === 0) return;
+            syncing = true;
+            updateSyncBadge();
+            try {
+                while (syncQueue.length > 0) {
+                    await sendToSheet(syncQueue[0]);
+                    syncQueue.shift();
+                    saveSyncQueue();
+                }
+            } catch (err) {
+                /* still offline - try again later */
+            } finally {
+                syncing = false;
+                updateSyncBadge();
+            }
+        }
+
+        function updateSyncBadge() {
+            const badge = document.getElementById('syncBadge');
+            if (!badge) return;
+            const n = syncQueue.length;
+            badge.classList.toggle('hidden', n === 0);
+            const label = `${n} check-in${n === 1 ? '' : 's'}`;
+            badge.textContent = syncing ? `Syncing ${label}\u2026` : `${label} pending sync \u2014 tap to retry`;
+        }
+
+        window.addEventListener('online', flushQueue);
+        setInterval(flushQueue, 30000);
+        updateSyncBadge();
+        flushQueue();
+
+        // ===== Admin auto-lock after inactivity =====
+        const ADMIN_IDLE_MS = 5 * 60 * 1000;
+        let lastAdminActivity = Date.now();
+        ['pointerdown', 'keydown', 'input', 'scroll', 'touchstart'].forEach(ev =>
+            document.addEventListener(ev, () => { lastAdminActivity = Date.now(); }, true)
+        );
+
+        function checkAdminIdle() {
+            if (adminUnlocked && Date.now() - lastAdminActivity > ADMIN_IDLE_MS) {
+                switchView('checkin');
+                showAlert('Admin locked after 5 minutes of inactivity.', 'ok');
+            }
+        }
+        setInterval(checkAdminIdle, 10000);
 
         // Handle Form Submission & Google Sheets Sync
         async function handleCheckIn(e) {
@@ -1100,8 +1220,7 @@
             unlockAudio();
             const name = document.getElementById('staffSelect').value;
             const shift = document.getElementById('shiftSelect').value;
-            const date = document.getElementById('attendanceDate').value;
-            const dayOfWeek = getDayOfWeekName(date);
+            const pickedDate = document.getElementById('attendanceDate').value;
 
             if (!name) {
                 showAlert("Please select your name from roster.", "err");
@@ -1111,11 +1230,16 @@
                 showAlert("Please choose your shift.", "err");
                 return;
             }
-            if (!adminUnlocked && date !== todayStr()) {
+            if (!adminUnlocked && pickedDate !== todayStr()) {
                 applyDateLock();
                 showAlert("Check-in is only allowed for today's date.", "err");
                 return;
             }
+
+            // A night shift checked in after midnight is logged against the day it started
+            const date = getEffectiveShiftDate(pickedDate, shift);
+            const dayOfWeek = getDayOfWeekName(date);
+
             if (attendanceLogs.some(l => l.name === name && l.date === date && l.shift === shift)) {
                 showAlert(`${name} has already checked in for the ${shift} shift on ${date}.`, "err");
                 return;
@@ -1125,7 +1249,7 @@
                 return;
             }
 
-            const sigDataUrl = signaturePad.toDataURL();
+            const sigDataUrl = getCompactSignature();
             const now = new Date();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -1143,24 +1267,24 @@
             attendanceLogs.unshift(newLog);
             saveLogs();
 
-            // Send payload to Google Sheets
+            // Send to Google Sheets; if that fails, queue it for automatic retry
+            showAlert(`Sending check-in for ${name}...`, "ok");
+            let synced = false;
             try {
-                showAlert(`Sending check-in for ${name}...`, "ok");
-
-                await fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(newLog)
-                });
-
-                showAlert(`Thank you, ${name}. Checked in & synced to Google Sheet!`, "ok");
-                triggerSuccessFeedback(name, shift);
+                await sendToSheet(newLog);
+                synced = true;
             } catch (err) {
-                console.error("Sheet sync error:", err);
-                showAlert(`Checked in locally, but Google Sheet sync failed.`, "err");
+                console.warn("Sheet sync failed, queued for retry:", err);
+                enqueueSync(newLog);
+            }
+
+            if (synced) {
+                showAlert(`Thank you, ${name}. Checked in & synced to Google Sheet!`, "ok");
+                triggerSuccessFeedback(name, shift, false);
+                flushQueue();
+            } else {
+                showAlert(`Thank you, ${name}. Checked in - saved on this phone and will sync automatically.`, "ok");
+                triggerSuccessFeedback(name, shift, true);
             }
 
             // Reset form
@@ -1289,7 +1413,7 @@
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
                 const sigDisplay = (r.signature && /^data:image\//.test(r.signature))
                     ? `<img src="${esc(r.signature)}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">`
-                    : '<span class="text-[10px] text-slate-400">Imported</span>';
+                    : '<span class="text-[10px] text-slate-400">&mdash;</span>';
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
                         <td class="p-2.5 font-medium text-slate-800">${esc(r.name)}</td>
