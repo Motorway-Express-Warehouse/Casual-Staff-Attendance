@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hisense - Motorway Express Warehouse Attendance</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS for Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Signature Pad Library -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <!-- Inter Font for Apple-like San Francisco Typography -->
+    <!-- Inter Font for Apple-like San Francisco Typography inside the app -->
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     
     <style>
@@ -19,57 +19,38 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Apple Glassmorphism Utility */
-        .apple-glass {
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-
-        .apple-glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(25px) saturate(190%);
-            -webkit-backdrop-filter: blur(25px) saturate(190%);
-            border: 1px solid rgba(229, 231, 235, 0.8);
-        }
-
-        .apple-glass-dark {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        /* Hisense Glowing Pulse */
+        /* ORIGINAL SPLASH SCREEN STYLES (UNTOUCHED) */
         @keyframes hisenseGlow {
             0% {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(37, 99, 235, 0.5);
-                transform: scale(0.98);
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 15px rgba(59, 130, 246, 0.4);
+                transform: scale(0.97);
             }
             50% {
-                text-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 50px rgba(37, 99, 235, 0.9), 0 0 80px rgba(29, 78, 216, 0.8);
-                transform: scale(1.02);
+                text-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 45px rgba(59, 130, 246, 0.9), 0 0 70px rgba(37, 99, 235, 0.8);
+                transform: scale(1.03);
             }
             100% {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(37, 99, 235, 0.5);
-                transform: scale(0.98);
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 15px rgba(59, 130, 246, 0.4);
+                transform: scale(0.97);
             }
         }
 
         .animate-hisense-glow {
-            animation: hisenseGlow 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            animation: hisenseGlow 3s ease-in-out infinite;
         }
 
-        /* Fast Truck Animation */
         @keyframes driveFastAnimation {
-            0% { left: -20%; }
-            100% { left: 110%; }
+            0% {
+                left: -20%;
+            }
+            100% {
+                left: 110%;
+            }
         }
 
         .truck-track {
             position: absolute;
-            bottom: 4rem;
+            bottom: 5rem;
             left: 0;
             width: 100%;
             height: 4rem;
@@ -84,7 +65,21 @@
             animation: driveFastAnimation 1.2s linear infinite;
         }
 
-        /* Apple Springy Interactions */
+        /* APPLE-LIKE MODERN UI UTILITIES (FOR MAIN APP & ADMIN) */
+        .apple-glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .apple-glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(25px) saturate(190%);
+            -webkit-backdrop-filter: blur(25px) saturate(190%);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+        }
+
         .btn-apple {
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -105,7 +100,6 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
-        /* View Switching Animations */
         .view-transition {
             transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -121,7 +115,6 @@
             display: block;
         }
 
-        /* Custom Scrollbar for Sleek Tables */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -133,45 +126,36 @@
             background: rgba(156, 163, 175, 0.4);
             border-radius: 9999px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(107, 114, 128, 0.7);
-        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50/40 min-h-screen text-slate-800 antialiased relative selection:bg-blue-500 selection:text-white pb-12">
 
-    <!-- INTRO SPLASH SCREEN WITH SLEEK DARK SHOWROOM BACKGROUND -->
-    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 transition-all duration-1000 ease-in-out overflow-hidden">
-        <!-- Ambient Radial Glow -->
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-slate-950/80 to-slate-950"></div>
-
-        <!-- Background Image & Overlay -->
-        <div class="absolute inset-0 z-0 opacity-40">
-            <img src="image_150cbd.jpg" alt="Hisense Warehouse" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+    <!-- ORIGINAL INTRO SPLASH SCREEN (UNTOUCHED PREVIOUS DESIGN) -->
+    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000 overflow-hidden">
+        <!-- Background Image & Lighter Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="image_150cbd.jpg" alt="Hisense Warehouse" class="w-full h-full object-cover opacity-75">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
         </div>
 
         <!-- Centered Branding Content -->
-        <div class="relative z-10 text-center px-6 select-none flex flex-col items-center max-w-2xl">
-            <div class="apple-glass-dark px-8 py-10 rounded-3xl shadow-2xl border border-white/10 flex flex-col items-center backdrop-blur-3xl">
-                <!-- Glowing Hisense Title -->
-                <h1 class="text-6xl md:text-8xl font-black text-white tracking-tight leading-none animate-hisense-glow drop-shadow-2xl">
-                    Hisense
-                </h1>
-                <div class="h-1 w-24 bg-gradient-to-r from-blue-500 to-blue-400 rounded-full my-6 shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
-                
-                <!-- Warehouse Subtitle -->
-                <p class="text-lg md:text-2xl font-bold text-blue-300 tracking-widest uppercase drop-shadow">
-                    Motorway Express Warehouse
-                </p>
-                <p class="text-xs text-slate-400 font-medium tracking-widest uppercase mt-2">Attendance Portal</p>
-            </div>
+        <div class="relative z-10 text-center px-6 select-none flex flex-col items-center">
+            <!-- Glowing Hisense Title -->
+            <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight animate-hisense-glow">
+                Hisense
+            </h1>
+            <div class="h-1.5 w-36 bg-blue-500 mx-auto my-4 rounded-full shadow-lg"></div>
+            
+            <!-- Warehouse Subtitle -->
+            <p class="text-xl md:text-3xl font-extrabold text-blue-300 tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                Motorway Express Warehouse
+            </p>
         </div>
 
         <!-- Fast Moving Truck Track -->
         <div class="truck-track z-20">
             <div class="fast-truck">
-                <svg class="w-16 h-16 md:w-20 md:h-20 text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.9)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-16 h-16 md:w-20 md:h-20 text-blue-300 drop-shadow-[0_0_12px_rgba(59,130,246,0.9)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m10 0a2 2 0 104 0"></path>
                 </svg>
@@ -179,15 +163,15 @@
         </div>
         
         <!-- Loading Progress Indicator -->
-        <div class="absolute bottom-8 z-10 flex flex-col items-center gap-3">
-            <span class="text-[11px] uppercase tracking-[0.25em] text-slate-400 font-medium">Initializing System</span>
-            <div class="w-44 h-1 bg-slate-800/80 rounded-full overflow-hidden p-0.5 border border-white/10 shadow-inner">
-                <div class="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-pulse"></div>
+        <div class="absolute bottom-6 z-10 flex flex-col items-center gap-2">
+            <span class="text-xs uppercase tracking-widest text-gray-200 font-semibold drop-shadow">Initializing System...</span>
+            <div class="w-36 h-1 bg-gray-700/80 rounded-full overflow-hidden">
+                <div class="w-full h-full bg-blue-400 animate-pulse"></div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER WITH APPLE GLASSMORPHISM -->
+    <!-- MAIN APP CONTAINER WITH MODERN APPLE-LIKE UI -->
     <main id="mainContainer" class="max-w-4xl mx-auto mt-4 md:mt-8 px-4 opacity-0 transition-all duration-1000 ease-out">
         
         <!-- HEADER & NAVIGATION BAR -->
@@ -263,8 +247,8 @@
                         <div class="relative">
                             <select id="shiftSelect" required class="input-apple w-full p-3.5 border border-slate-200/90 rounded-2xl bg-white/90 text-slate-800 text-sm font-medium focus:outline-none appearance-none shadow-sm cursor-pointer">
                                 <option value="">-- Select Shift --</option>
-                                <option value="DAY">☀️ DAY SHIFT</option>
-                                <option value="NIGHT">🌙 NIGHT SHIFT</option>
+                                <option value="DAY"> DAY </option>
+                                <option value="NIGHT"> NIGHT </option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -511,7 +495,7 @@
         // Populate Name Dropdown from staffList array
         function populateDropdown() {
             const select = document.getElementById('staffSelect');
-            select.innerHTML = '<option value="">-- Select your name from roster --</option>';
+            select.innerHTML = '<option value="">-- Choose your name from roster --</option>';
             staffList.forEach(name => {
                 const opt = document.createElement('option');
                 opt.value = name;
