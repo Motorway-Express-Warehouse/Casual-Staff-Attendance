@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Signature Pad Library -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <!-- Inter Font for Apple-like San Francisco Typography inside the app -->
+    <!-- Inter Font for Apple-like San Francisco Typography -->
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     
     <style>
@@ -17,6 +17,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
         /* ORIGINAL SPLASH SCREEN STYLES (UNTOUCHED) */
@@ -65,21 +66,137 @@
             animation: driveFastAnimation 1.2s linear infinite;
         }
 
-        /* APPLE-LIKE MODERN UI UTILITIES (FOR MAIN APP & ADMIN) */
-        .apple-glass {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+        /* ================= THEME STYLING & VARIABLES ================= */
+        :root[data-theme="light"] {
+            --bg-gradient: linear-gradient(to bottom right, #f1f5f9, #f8fafc, rgba(59, 130, 246, 0.04));
+            --text-main: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(229, 231, 235, 0.8);
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: #cbd5e1;
+            --table-header: #f1f5f9;
         }
 
-        .apple-glass-card {
-            background: rgba(255, 255, 255, 0.88);
+        :root[data-theme="dark"] {
+            --bg-gradient: linear-gradient(to bottom right, #090d16, #0f172a, #020617);
+            --text-main: #f8fafc;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --card-border: rgba(51, 65, 85, 0.7);
+            --header-bg: rgba(15, 23, 42, 0.75);
+            --input-bg: rgba(30, 41, 59, 0.9);
+            --input-border: #475569;
+            --table-header: #1e293b;
+        }
+
+        :root[data-theme="gold"] {
+            --bg-gradient: linear-gradient(to bottom right, #18130d, #261c12, #110d09);
+            --text-main: #fef3c7;
+            --card-bg: rgba(38, 28, 18, 0.88);
+            --card-border: rgba(217, 119, 6, 0.35);
+            --header-bg: rgba(38, 28, 18, 0.8);
+            --input-bg: rgba(54, 40, 26, 0.9);
+            --input-border: #b45309;
+            --table-header: #2d2114;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+        }
+
+        .theme-card {
+            background: var(--card-bg);
             backdrop-filter: blur(25px) saturate(190%);
             -webkit-backdrop-filter: blur(25px) saturate(190%);
-            border: 1px solid rgba(229, 231, 235, 0.8);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
         }
 
+        .theme-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-input {
+            background: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-main);
+        }
+
+        /* ================= OVERHEAD PULL-CORD COMPONENT ================= */
+        .pull-cord-assembly {
+            position: absolute;
+            top: 0;
+            right: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 50;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .cord-string {
+            width: 3px;
+            height: 38px;
+            background: linear-gradient(to right, #94a3b8, #cbd5e1, #64748b);
+            box-shadow: 1px 0 3px rgba(0,0,0,0.15);
+            transform-origin: top center;
+            transition: height 0.15s ease-out;
+        }
+
+        .cord-handle {
+            width: 16px;
+            height: 26px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 2px 3px rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pull-cord-assembly:hover .cord-handle {
+            transform: translateY(4px) scale(1.05);
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+        }
+
+        .pull-cord-assembly:active .cord-string {
+            height: 58px;
+        }
+
+        .pull-cord-assembly:active .cord-handle {
+            transform: translateY(20px) scale(0.95);
+        }
+
+        /* Theme Label Tooltip */
+        .cord-tooltip {
+            position: absolute;
+            top: 72px;
+            right: -24px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .pull-cord-assembly:hover .cord-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* APPLE-LIKE MODERN UI UTILITIES */
         .btn-apple {
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -127,7 +244,7 @@
             border-radius: 9999px;
         }
 
-        /* ===== APPLE SEGMENTED CAPSULE SHIFT SWITCHER ===== */
+        /* APPLE SEGMENTED CAPSULE SHIFT SWITCHER */
         .shift-switch {
             position: relative;
             display: grid;
@@ -189,10 +306,6 @@
         .shift-option:active {
             transform: scale(0.96);
         }
-        .shift-option:focus-visible {
-            outline: 2px solid #2563eb;
-            outline-offset: 2px;
-        }
         .shift-option svg {
             width: 16px;
             height: 16px;
@@ -204,7 +317,7 @@
             color: #4338ca;
         }
 
-        /* ===== SUCCESS OVERLAY (CHECKMARK + BOUNCE) ===== */
+        /* SUCCESS OVERLAY (CHECKMARK + BOUNCE) */
         .success-overlay {
             position: fixed;
             inset: 0;
@@ -212,7 +325,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(15, 23, 42, 0.25);
+            background: rgba(15, 23, 42, 0.35);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             opacity: 0;
@@ -259,7 +372,7 @@
             to { stroke-dashoffset: 0; }
         }
 
-        /* ===== APPLE SEGMENTED NAV (CHECK-IN / ADMIN) ===== */
+        /* APPLE SEGMENTED NAV (CHECK-IN / ADMIN) */
         .nav-seg {
             position: relative;
             display: grid;
@@ -304,10 +417,9 @@
         }
         .nav-opt:active { transform: scale(0.96); }
         .nav-opt.active { color: #2563eb; }
-        .nav-opt:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50/40 min-h-screen text-slate-800 antialiased relative selection:bg-blue-500 selection:text-white pb-12">
+<body class="min-h-screen antialiased relative selection:bg-blue-500 selection:text-white pb-12">
 
     <!-- ORIGINAL INTRO SPLASH SCREEN (UNTOUCHED PREVIOUS DESIGN) -->
     <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000 overflow-hidden">
@@ -351,25 +463,32 @@
     </div>
 
     <!-- MAIN APP CONTAINER WITH MODERN APPLE-LIKE UI -->
-    <main id="mainContainer" class="max-w-4xl mx-auto mt-4 md:mt-8 px-4 opacity-0 transition-all duration-1000 ease-out">
+    <main id="mainContainer" class="max-w-4xl mx-auto mt-4 md:mt-8 px-4 opacity-0 transition-all duration-1000 ease-out relative">
         
+        <!-- OVERHEAD PULL-CORD THEME TOGGLE -->
+        <div class="pull-cord-assembly" onclick="cycleTheme()" title="Pull or click to change theme">
+            <div class="cord-string"></div>
+            <div class="cord-handle"></div>
+            <div id="cordTooltip" class="cord-tooltip">Theme: Light</div>
+        </div>
+
         <!-- HEADER & NAVIGATION BAR -->
-        <header class="apple-glass rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] mb-6 border border-white/80 sticky top-4 z-40">
+        <header class="theme-header rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] mb-6 sticky top-4 z-40">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
                         H
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Motorway Express</h1>
-                        <p class="text-xs text-slate-500 font-medium">Hisense Warehouse • Casual Staff Attendance</p>
+                        <h1 class="text-xl font-bold tracking-tight">Motorway Express</h1>
+                        <p class="text-xs opacity-70 font-medium">Hisense Warehouse • Casual Staff Attendance</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end pr-16 md:pr-0">
                     <!-- Date Input -->
                     <div class="relative">
-                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple bg-white/80 border border-slate-200 text-slate-800 font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple theme-input border font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer">
                     </div>
                     
                     <!-- View Toggle Pill Segment Control -->
@@ -384,10 +503,10 @@
 
         <!-- VIEW 1: CHECK-IN PAGE -->
         <div id="checkinView" class="view-transition view-visible">
-            <div class="apple-glass-card rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)]">
+            <div class="theme-card rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)]">
                 
                 <!-- Live Status Bar Card -->
-                <div class="bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50/80 border border-blue-100/80 rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm">
+                <div class="bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50/80 border border-blue-100/80 rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm text-slate-800">
                     <div class="flex items-center gap-3">
                         <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
                         <div>
@@ -401,19 +520,19 @@
                     </div>
                 </div>
 
-                <button type="button" id="syncBadge" onclick="flushQueue()" class="hidden w-full mb-4 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-center"></button>
+                <button type="button" id="syncBadge" onclick="flushQueue()" class="hidden w-full mb-4 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-center hover:bg-amber-100 transition"></button>
 
                 <div id="alertBox"></div>
 
                 <form id="checkinForm" onsubmit="handleCheckIn(event)" class="space-y-5">
                     <!-- Staff Dropdown -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2" for="staffSelect">Select Your Name</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 opacity-80" for="staffSelect">Select Your Name</label>
                         <div class="relative">
-                            <select id="staffSelect" required class="input-apple w-full p-3.5 border border-slate-200/90 rounded-2xl bg-white/90 text-slate-800 text-sm font-medium focus:outline-none appearance-none shadow-sm cursor-pointer">
+                            <select id="staffSelect" required class="input-apple theme-input w-full p-3.5 border rounded-2xl text-sm font-medium focus:outline-none appearance-none shadow-sm cursor-pointer">
                                 <option value="">-- Choose your name from roster --</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 opacity-50">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
@@ -421,8 +540,7 @@
 
                     <!-- Shift: Apple Segmented Capsule Switcher -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Work Shift</label>
-                        <!-- Hidden input keeps existing logic working (id="shiftSelect") -->
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 opacity-80">Work Shift</label>
                         <input type="hidden" id="shiftSelect" value="">
                         <div id="shiftSwitch" class="shift-switch" data-value="" role="radiogroup" aria-label="Work Shift">
                             <div class="shift-thumb"></div>
@@ -438,29 +556,29 @@
                     </div>
 
                     <!-- Auto Day Badge -->
-                    <div class="bg-slate-100/70 p-3.5 rounded-2xl border border-slate-200/60 flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-500">Check-In Day</span>
+                    <div class="p-3.5 rounded-2xl border border-white/10 bg-black/5 flex justify-between items-center">
+                        <span class="text-xs font-semibold opacity-70">Check-In Day</span>
                         <span id="autoDayBadge" class="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-500/20">-</span>
                     </div>
 
                     <!-- Signature Canvas -->
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Digital Signature</label>
+                            <label class="text-xs font-semibold uppercase tracking-wider opacity-80">Digital Signature</label>
                             <span id="sigWarning" class="text-xs text-rose-500 font-medium">Required</span>
                         </div>
-                        <div class="border border-slate-200/90 rounded-2xl bg-slate-50/50 p-2 shadow-inner">
-                            <canvas id="pad" class="w-full h-36 touch-none rounded-xl bg-white cursor-crosshair"></canvas>
+                        <div class="border rounded-2xl p-2 shadow-inner bg-white">
+                            <canvas id="pad" class="w-full h-36 touch-none rounded-xl cursor-crosshair"></canvas>
                         </div>
                         <div class="flex justify-between items-center mt-2.5">
-                            <button type="button" onclick="clearPad()" class="btn-apple px-3.5 py-1.5 text-xs font-semibold bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 rounded-xl">Clear Canvas</button>
-                            <span class="text-[11px] text-slate-400">Sign with finger or stylus</span>
+                            <button type="button" onclick="clearPad()" class="btn-apple px-3.5 py-1.5 text-xs font-semibold bg-slate-200/80 hover:bg-slate-300 text-slate-800 rounded-xl">Clear Canvas</button>
+                            <span class="text-[11px] opacity-60">Sign with finger or stylus</span>
                         </div>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn-apple w-full py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-blue-500/25 transition">
-                        Confirm & Submit Check-In
+                    <button type="submit" id="submitBtn" class="btn-apple w-full py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+                        <span>Confirm & Submit Check-In</span>
                     </button>
                 </form>
             </div>
@@ -470,10 +588,10 @@
         <div id="adminView" class="view-transition view-hidden space-y-6">
             
             <!-- Admin Control Hub Header -->
-            <div class="apple-glass-card rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="theme-card rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900">Admin Control Hub</h3>
-                    <p class="text-xs text-slate-500">Manage roster, view cumulative summaries, or export merged CSV logs.</p>
+                    <h3 class="text-lg font-bold">Admin Control Hub</h3>
+                    <p class="text-xs opacity-70">Manage roster, view cumulative summaries, or export merged CSV logs.</p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full md:w-auto">
                     <label class="btn-apple bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm cursor-pointer inline-flex items-center gap-1.5">
@@ -498,19 +616,19 @@
             </div>
 
             <!-- Staff Roster Card -->
-            <div class="apple-glass-card rounded-3xl p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">Staff Roster Management</h3>
+            <div class="theme-card rounded-3xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Staff Roster Management</h3>
                 <div class="relative mb-3">
-                    <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
-                    <input type="search" id="staffSearch" oninput="renderAdminData()" placeholder="Search staff roster..." class="input-apple w-full border border-slate-200/90 pl-10 pr-3 py-2.5 rounded-2xl text-xs bg-slate-50/80 focus:outline-none">
+                    <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
+                    <input type="search" id="staffSearch" oninput="renderAdminData()" placeholder="Search staff roster..." class="input-apple theme-input w-full border pl-10 pr-3 py-2.5 rounded-2xl text-xs focus:outline-none">
                 </div>
                 <div class="flex gap-2 mb-4">
-                    <input type="text" id="newStaffInput" placeholder="Enter full name..." class="input-apple flex-1 border border-slate-200/90 p-3 rounded-2xl text-xs bg-white focus:outline-none">
+                    <input type="text" id="newStaffInput" placeholder="Enter full name..." class="input-apple theme-input flex-1 border p-3 rounded-2xl text-xs focus:outline-none">
                     <button onclick="addStaff()" class="btn-apple bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-3 rounded-2xl shadow-sm">
                         Add Staff
                     </button>
                 </div>
-                <div class="max-h-44 overflow-y-auto border border-slate-200/80 rounded-2xl bg-white/50">
+                <div class="max-h-44 overflow-y-auto border border-white/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <tbody id="adminStaffTable"></tbody>
                     </table>
@@ -518,12 +636,12 @@
             </div>
 
             <!-- Summary Card -->
-            <div class="apple-glass-card rounded-3xl p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">Attendance Summary</h3>
-                <div class="overflow-x-auto border border-slate-200/80 rounded-2xl bg-white/50">
+            <div class="theme-card rounded-3xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Attendance Summary</h3>
+                <div class="overflow-x-auto border border-white/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="bg-slate-100/80 border-b border-slate-200/80 text-slate-600">
+                            <tr class="border-b border-white/10 opacity-75">
                                 <th class="p-3 font-semibold">Name</th>
                                 <th class="p-3 font-semibold">Day Shifts</th>
                                 <th class="p-3 font-semibold">Night Shifts</th>
@@ -537,18 +655,18 @@
             </div>
 
             <!-- All Logs Card -->
-            <div class="apple-glass-card rounded-3xl p-6 shadow-sm">
+            <div class="theme-card rounded-3xl p-6 shadow-sm">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">All Check-In Activity (<span id="totalLogsCount">0</span>)</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider">All Check-In Activity (<span id="totalLogsCount">0</span>)</h3>
                     <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
-                        <input type="search" id="logSearch" oninput="renderAdminData()" placeholder="Search name, shift, date..." class="input-apple w-40 md:w-60 border border-slate-200/90 pl-9 pr-3 py-2 rounded-2xl text-xs bg-slate-50/80 focus:outline-none">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>
+                        <input type="search" id="logSearch" oninput="renderAdminData()" placeholder="Search logs..." class="input-apple theme-input w-40 md:w-60 border pl-9 pr-3 py-2 rounded-2xl text-xs focus:outline-none">
                     </div>
                 </div>
-                <div class="overflow-x-auto max-h-64 border border-slate-200/80 rounded-2xl bg-white/50">
+                <div class="overflow-x-auto max-h-64 border border-white/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="bg-slate-100/80 border-b border-slate-200/80 text-slate-600">
+                            <tr class="border-b border-white/10 opacity-75">
                                 <th class="p-3 font-semibold">Name</th>
                                 <th class="p-3 font-semibold">Day</th>
                                 <th class="p-3 font-semibold">Shift</th>
@@ -566,7 +684,7 @@
 
     <!-- SUCCESS OVERLAY -->
     <div id="successOverlay" class="success-overlay" onclick="hideSuccessOverlay()">
-        <div class="success-card">
+        <div class="success-card text-slate-900">
             <svg class="mx-auto mb-3" width="84" height="84" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle class="success-circle" cx="26" cy="26" r="25" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"></circle>
                 <path class="success-check" d="M14 27 l8 8 l16 -16" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -581,27 +699,44 @@
         // Google Sheet Web App URL
         const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHIF2WzZGnfp7fB1JX1WoxeGPKc2LrJ9sKObPZdj8vYhge1ehSLiGgrRSSeHWN5YCJHQ/exec";
 
+        // ================= THEME CYCLER LOGIC =================
+        const themes = ['light', 'dark', 'gold'];
+        const themeNames = { light: 'Light Mode', dark: 'Midnight Slate', gold: 'Executive Gold' };
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('motorway_theme', theme);
+            document.getElementById('cordTooltip').textContent = `Theme: ${themeNames[theme]}`;
+        }
+
+        function cycleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextIdx = (themes.indexOf(current) + 1) % themes.length;
+            applyTheme(themes[nextIdx]);
+        }
+
+        // Initialize saved theme on load
+        const savedTheme = localStorage.getItem('motorway_theme') || 'light';
+        applyTheme(savedTheme);
+
         // Automatic Splash Screen Transition Timer (3 seconds)
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 const main = document.getElementById('mainContainer');
                 
-                // Fade out splash screen
                 splash.style.opacity = '0';
                 
                 setTimeout(() => {
                     splash.style.display = 'none';
-                    // Fade in main app interface
                     main.classList.remove('opacity-0');
                     main.classList.add('opacity-100');
-                    // Initialize signature canvas after layout is visible
                     initSignaturePad();
                 }, 1000);
             }, 3000);
         });
 
-        // Combined Staff Array (Original + New + Richmond Adzoda)
+        // Combined Staff Array
         const defaultStaff = [
             "Patrick Apawudza",
             "John Njoku",
@@ -631,163 +766,39 @@
             }
         }
 
-        // Roster: saved list + any names newly added to defaultStaff in code (unless an admin removed them)
         let removedStaff = loadJSON('motorway_removed_staff', []);
         let staffList = loadJSON('motorway_staff', []);
+        
         defaultStaff.forEach(n => {
-            if (!staffList.includes(n) && !removedStaff.includes(n)) staffList.push(n);
+            if (!staffList.includes(n) && !removedStaff.includes(n)) {
+                staffList.push(n);
+            }
         });
         staffList.sort((a, b) => a.localeCompare(b));
         localStorage.setItem('motorway_staff', JSON.stringify(staffList));
 
         let attendanceLogs = loadJSON('motorway_logs', []);
+        let offlineQueue = loadJSON('motorway_offline_queue', []);
 
-        function saveLogs() {
-            const attempt = () => localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
-            try { attempt(); return; } catch (err) { /* storage full: shrink below */ }
-            // Keep signature images only on the newest 50 logs (the Google Sheet holds the full record)
-            attendanceLogs.forEach((l, i) => { if (i >= 50) l.signature = ''; });
-            try { attempt(); return; } catch (err) { /* still full */ }
-            attendanceLogs.forEach(l => { l.signature = ''; });
-            try { attempt(); } catch (err) { console.warn('Local log storage is unavailable:', err); }
-        }
-
-
-        // SHA-256 (so the PIN and recovery code are never stored or shipped in plain text)
-        function sha256(ascii) {
-            function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
-            const maxWord = Math.pow(2, 32);
-            let result = '';
-            const words = [];
-            const asciiBitLength = ascii.length * 8;
-            let hash = sha256.h = sha256.h || [];
-            const k = sha256.k = sha256.k || [];
-            let primeCounter = k.length;
-            const isComposite = {};
-            for (let candidate = 2; primeCounter < 64; candidate++) {
-                if (!isComposite[candidate]) {
-                    for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
-                    hash[primeCounter] = (Math.pow(candidate, 0.5) * maxWord) | 0;
-                    k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
-                }
-            }
-            ascii += '\x80';
-            while (ascii.length % 64 - 56) ascii += '\x00';
-            for (let i = 0; i < ascii.length; i++) {
-                const j = ascii.charCodeAt(i);
-                if (j >> 8) return null;
-                words[i >> 2] |= j << ((3 - i) % 4) * 8;
-            }
-            words[words.length] = ((asciiBitLength / maxWord) | 0);
-            words[words.length] = (asciiBitLength);
-            for (let j = 0; j < words.length;) {
-                const w = words.slice(j, j += 16);
-                const oldHash = hash;
-                hash = hash.slice(0, 8);
-                for (let i = 0; i < 64; i++) {
-                    const w15 = w[i - 15], w2 = w[i - 2];
-                    const a = hash[0], e = hash[4];
-                    const temp1 = hash[7]
-                        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
-                        + ((e & hash[5]) ^ ((~e) & hash[6]))
-                        + k[i]
-                        + (w[i] = (i < 16) ? w[i] : (
-                            w[i - 16]
-                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
-                            + w[i - 7]
-                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
-                        ) | 0);
-                    const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
-                        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
-                    hash = [(temp1 + temp2) | 0].concat(hash);
-                    hash[4] = (hash[4] + temp1) | 0;
-                }
-                for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
-            }
-            for (let i = 0; i < 8; i++) {
-                for (let j = 3; j + 1; j--) {
-                    const b = (hash[i] >> (j * 8)) & 255;
-                    result += ((b < 16) ? 0 : '') + b.toString(16);
-                }
-            }
-            return result;
-        }
-
-        // Admin Security: only salted hashes are stored / shipped
-        const PIN_SALT = "motorway-v1:";
-        const MASTER_RECOVERY_HASH = "00bbc61368de7222985ee87ac2cce0a54271a61b2212faab70e003d6df81603e";
-
-        function hashPin(value) {
-            return sha256(unescape(encodeURIComponent(PIN_SALT + value)));
-        }
-
-        let adminPinHash = localStorage.getItem('motorway_admin_pin_hash') || null;
-
-        // Migrate any older plain-text PIN to a hash, then delete the plain copy
-        (function migrateLegacyPin() {
-            const legacy = localStorage.getItem('motorway_admin_pin');
-            if (legacy) {
-                if (!adminPinHash) {
-                    adminPinHash = hashPin(legacy);
-                    localStorage.setItem('motorway_admin_pin_hash', adminPinHash);
-                }
-                localStorage.removeItem('motorway_admin_pin');
-            }
-        })();
-
-        let failedAttempts = 0;
-        let lockUntil = Number(localStorage.getItem('motorway_lock_until')) || 0;
+        let adminPin = localStorage.getItem('motorway_admin_pin') || "1234";
+        const MASTER_RECOVERY_CODE = "motorway2026";
 
         let signaturePad = null;
-        let adminUnlocked = false;
+        document.getElementById('attendanceDate').valueAsDate = new Date();
 
-        // Set default date picker value to today
-        document.getElementById('attendanceDate').value = todayStr();
-
-        // ===== Segmented Capsule Shift Switcher =====
-        function setShift(value) {
+        function setShift(val) {
+            document.getElementById('shiftSelect').value = val;
             const sw = document.getElementById('shiftSwitch');
-            document.getElementById('shiftSelect').value = value;
-            sw.dataset.value = value;
-            sw.querySelectorAll('.shift-option').forEach(btn => {
-                const active = btn.dataset.shift === value;
-                btn.classList.toggle('active', active);
-                btn.setAttribute('aria-checked', active ? 'true' : 'false');
+            sw.setAttribute('data-value', val);
+
+            const opts = sw.querySelectorAll('.shift-option');
+            opts.forEach(btn => {
+                const isMatch = btn.getAttribute('data-shift') === val;
+                btn.classList.toggle('active', isMatch);
+                btn.setAttribute('aria-checked', isMatch ? "true" : "false");
             });
-            updateSelectedDayDisplay();
         }
 
-        // Today's date in the device's local time (YYYY-MM-DD)
-        function fmtDate(d) {
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-
-        function todayStr() {
-            return fmtDate(new Date());
-        }
-
-        // A NIGHT check-in before this hour belongs to the previous day's shift
-        const NIGHT_SHIFT_CUTOFF_HOUR = 6;
-
-        function getEffectiveShiftDate(dateVal, shift) {
-            if (!adminUnlocked && shift === 'NIGHT' && dateVal === todayStr() && new Date().getHours() < NIGHT_SHIFT_CUTOFF_HOUR) {
-                const [y, m, d] = dateVal.split('-').map(Number);
-                return fmtDate(new Date(y, m - 1, d - 1));
-            }
-            return dateVal;
-        }
-
-        // Staff can only check in for today; the date picker unlocks only inside the Admin session
-        function applyDateLock() {
-            const el = document.getElementById('attendanceDate');
-            el.disabled = !adminUnlocked;
-            if (!adminUnlocked && el.value !== todayStr()) {
-                el.value = todayStr();
-                updateSelectedDayDisplay();
-            }
-        }
-
-        // Helper function to extract Day Name from Date String
         function getDayOfWeekName(dateString) {
             if (!dateString) return '';
             const parts = dateString.split('-');
@@ -798,13 +809,10 @@
             return new Date(dateString).toLocaleDateString(undefined, { weekday: 'long' });
         }
 
-        // Update day indicator and date header whenever date input changes
         function updateSelectedDayDisplay() {
             const dateVal = document.getElementById('attendanceDate').value;
-            const shiftVal = document.getElementById('shiftSelect').value;
-            const shiftDate = getEffectiveShiftDate(dateVal, shiftVal);
-            const dayName = getDayOfWeekName(shiftDate);
-            document.getElementById('autoDayBadge').textContent = shiftDate !== dateVal ? `${dayName} (night shift)` : dayName;
+            const dayName = getDayOfWeekName(dateVal);
+            document.getElementById('autoDayBadge').textContent = dayName;
 
             const parts = dateVal.split('-');
             let formattedDateStr = dateVal;
@@ -815,18 +823,14 @@
             document.getElementById('liveDate').textContent = formattedDateStr;
         }
 
-        // Live Clock Loop
         function updateClock() {
             const now = new Date();
             document.getElementById('liveClock').textContent = now.toLocaleTimeString();
-            applyDateLock();
-            updateSelectedDayDisplay();
         }
         setInterval(updateClock, 1000);
         updateClock();
         updateSelectedDayDisplay();
 
-        // Initialize Signature Pad Canvas
         function initSignaturePad() {
             const canvas = document.getElementById('pad');
             const ratio = window.devicePixelRatio || 1;
@@ -848,7 +852,6 @@
             if (signaturePad) signaturePad.clear();
         }
 
-        // Populate Name Dropdown from staffList array
         function populateDropdown() {
             const select = document.getElementById('staffSelect');
             select.innerHTML = '<option value="">-- Choose your name from roster --</option>';
@@ -861,28 +864,24 @@
         }
         populateDropdown();
 
-        // Apple-style Smooth View Switcher
-        function setNav(view) {
-            document.getElementById('navSwitch').dataset.value = view;
-            document.getElementById('navCheckin').classList.toggle('active', view === 'checkin');
-            document.getElementById('navAdmin').classList.toggle('active', view === 'admin');
-        }
-
         function switchView(view) {
-            setNav(view);
-            adminUnlocked = (view === 'admin');
-            if (view === 'admin') lastAdminActivity = Date.now();
-            applyDateLock();
             const checkin = document.getElementById('checkinView');
             const admin = document.getElementById('adminView');
+            const navSw = document.getElementById('navSwitch');
 
             if (view === 'checkin') {
+                navSw.setAttribute('data-value', 'checkin');
+                document.getElementById('navCheckin').classList.add('active');
+                document.getElementById('navAdmin').classList.remove('active');
                 admin.classList.replace('view-visible', 'view-hidden');
                 setTimeout(() => {
                     checkin.classList.replace('view-hidden', 'view-visible');
                     initSignaturePad();
                 }, 150);
             } else {
+                navSw.setAttribute('data-value', 'admin');
+                document.getElementById('navAdmin').classList.add('active');
+                document.getElementById('navCheckin').classList.remove('active');
                 checkin.classList.replace('view-visible', 'view-hidden');
                 setTimeout(() => {
                     admin.classList.replace('view-hidden', 'view-visible');
@@ -891,357 +890,112 @@
             }
         }
 
-        // Secure PIN Access Control
-        function isLocked() {
-            const remaining = lockUntil - Date.now();
-            if (remaining > 0) {
-                alert(`Too many failed attempts. Try again in ${Math.ceil(remaining / 1000)} seconds.`);
-                return true;
-            }
-            return false;
-        }
-
-        function registerFail() {
-            failedAttempts++;
-            if (failedAttempts >= 5) {
-                failedAttempts = 0;
-                lockUntil = Date.now() + 60000;
-                localStorage.setItem('motorway_lock_until', String(lockUntil));
-            }
-        }
-
-        function setAdminPin(pin) {
-            adminPinHash = hashPin(pin);
-            localStorage.setItem('motorway_admin_pin_hash', adminPinHash);
-        }
-
-        function isValidNewPin(pin) {
-            return !!pin && pin.trim().length >= 4;
-        }
-
         function checkAdminAccess() {
-            if (isLocked()) return;
-
-            // First use on this device: create a PIN (no default PIN exists)
-            if (!adminPinHash) {
-                const created = prompt("No Admin PIN is set yet.\n\nCreate a new Admin PIN (at least 4 characters):");
-                if (created === null) return;
-                if (!isValidNewPin(created)) {
-                    alert("PIN must be at least 4 characters.");
-                    return;
-                }
-                setAdminPin(created.trim());
-                alert("Admin PIN created!");
-                switchView('admin');
-                return;
-            }
-
-            const pin = prompt("Enter Admin PIN:");
+            let pin = prompt("Enter Admin PIN:");
             if (pin === null) return;
 
-            if (hashPin(pin.trim()) === adminPinHash) {
-                failedAttempts = 0;
+            if (pin === adminPin) {
                 switchView('admin');
-                return;
+            } else {
+                let choice = confirm("Incorrect PIN!\n\nClick 'OK' to reset PIN using Recovery Code, or 'Cancel' to try again.");
+                if (choice) {
+                    let recoveryInput = prompt("Enter Master Recovery Code:");
+                    if (recoveryInput === MASTER_RECOVERY_CODE) {
+                        let newPin = prompt("Enter your NEW Admin PIN:");
+                        if (newPin && newPin.trim().length > 0) {
+                            adminPin = newPin.trim();
+                            localStorage.setItem('motorway_admin_pin', adminPin);
+                            alert("Admin PIN successfully updated!");
+                            switchView('admin');
+                        } else {
+                            alert("PIN change cancelled.");
+                        }
+                    } else if (recoveryInput !== null) {
+                        alert("Incorrect Recovery Code!");
+                    }
+                }
             }
-
-            registerFail();
-            const choice = confirm("Incorrect PIN!\n\nClick 'OK' to reset PIN using Recovery Code, or 'Cancel' to try again.");
-            if (!choice) return;
-            if (isLocked()) return;
-
-            const recoveryInput = prompt("Enter Master Recovery Code:");
-            if (recoveryInput === null) return;
-            if (hashPin(recoveryInput.trim()) !== MASTER_RECOVERY_HASH) {
-                registerFail();
-                alert("Incorrect Recovery Code!");
-                return;
-            }
-
-            const newPin = prompt("Enter your NEW Admin PIN (at least 4 characters):");
-            if (newPin === null) return;
-            if (!isValidNewPin(newPin)) {
-                alert("PIN must be at least 4 characters. Change cancelled.");
-                return;
-            }
-            setAdminPin(newPin.trim());
-            failedAttempts = 0;
-            alert("Admin PIN successfully updated!");
-            switchView('admin');
         }
 
         function changePinPrompt() {
-            if (isLocked()) return;
-            if (!adminPinHash) {
-                alert("No Admin PIN is set yet.");
-                return;
-            }
-            const current = prompt("Enter current Admin PIN:");
-            if (current === null) return;
-            if (hashPin(current.trim()) !== adminPinHash) {
-                registerFail();
+            let current = prompt("Enter current Admin PIN:");
+            if (current === adminPin) {
+                let freshPin = prompt("Enter new Admin PIN:");
+                if (freshPin && freshPin.trim().length > 0) {
+                    adminPin = freshPin.trim();
+                    localStorage.setItem('motorway_admin_pin', adminPin);
+                    alert("Admin PIN updated successfully!");
+                } else {
+                    alert("Operation cancelled.");
+                }
+            } else if (current !== null) {
                 alert("Incorrect PIN.");
-                return;
-            }
-            const fresh = prompt("Enter new Admin PIN (at least 4 characters):");
-            if (fresh === null) return;
-            if (!isValidNewPin(fresh)) {
-                alert("PIN must be at least 4 characters. Operation cancelled.");
-                return;
-            }
-            setAdminPin(fresh.trim());
-            alert("Admin PIN updated successfully!");
-        }
-
-        // ===== Apple Pay-style success chime =====
-        // Primary: HTML audio element built from a generated WAV (plays even on iPhone silent mode)
-        // Backup: Web Audio API
-        let chimeAudio = null;
-        let chimeBusy = false;
-        let audioCtx = null;
-
-        function buildChimeWav() {
-            const sr = 44100, n = Math.floor(sr * 1.0);
-            const data = new Float32Array(n);
-            // [frequency Hz, start sec, length sec, volume] -> B5 then E6
-            const notes = [[987.77, 0, 0.55, 0.4], [1318.51, 0.11, 0.85, 0.45]];
-            notes.forEach(([f, st, len, vol]) => {
-                const s0 = Math.floor(st * sr), l = Math.floor(len * sr);
-                for (let i = 0; i < l && s0 + i < n; i++) {
-                    const t = i / sr;
-                    const env = Math.min(1, t / 0.012) * Math.exp(-4.5 * t / len);
-                    data[s0 + i] += vol * env * (Math.sin(2 * Math.PI * f * t) + 0.25 * Math.sin(2 * Math.PI * f * 2 * t));
-                }
-            });
-            const buf = new ArrayBuffer(44 + n * 2);
-            const v = new DataView(buf);
-            const w = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
-            w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
-            v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
-            v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
-            w(36, 'data'); v.setUint32(40, n * 2, true);
-            for (let i = 0; i < n; i++) {
-                const x = Math.max(-1, Math.min(1, data[i] * 0.8));
-                v.setInt16(44 + i * 2, x * 32767, true);
-            }
-            return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
-        }
-
-        // Must run inside a user gesture (the submit tap) so the browser allows sound later
-        function unlockAudio() {
-            try {
-                if (!chimeAudio) {
-                    chimeAudio = new Audio(buildChimeWav());
-                    chimeAudio.preload = 'auto';
-                    chimeAudio.addEventListener('ended', () => { chimeBusy = false; });
-                }
-                if (!chimeBusy) {
-                    chimeAudio.muted = true;
-                    const p = chimeAudio.play();
-                    const done = () => {
-                        if (!chimeBusy) { chimeAudio.pause(); chimeAudio.currentTime = 0; chimeAudio.muted = false; }
-                    };
-                    if (p && p.then) p.then(done).catch(() => { chimeAudio.muted = false; });
-                    else done();
-                }
-            } catch (err) { /* ignore */ }
-            try {
-                const AC = window.AudioContext || window.webkitAudioContext;
-                if (AC) {
-                    if (!audioCtx) audioCtx = new AC();
-                    if (audioCtx.state === 'suspended') audioCtx.resume();
-                }
-            } catch (err) { /* ignore */ }
-        }
-
-        function playTone(freq, start, duration, volume) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, start);
-            gain.gain.setValueAtTime(0.0001, start);
-            gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
-            gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(start);
-            osc.stop(start + duration + 0.05);
-        }
-
-        function playChimeWebAudio() {
-            if (!audioCtx) return;
-            try {
-                const t = audioCtx.currentTime + 0.02;
-                playTone(987.77, t, 0.55, 0.16);
-                playTone(1975.5, t, 0.35, 0.04);
-                playTone(1318.51, t + 0.11, 0.8, 0.18);
-                playTone(2637.0, t + 0.11, 0.5, 0.045);
-            } catch (err) { /* ignore */ }
-        }
-
-        function playSuccessChime() {
-            if (chimeAudio) {
-                chimeBusy = true;
-                chimeAudio.muted = false;
-                chimeAudio.volume = 1;
-                chimeAudio.currentTime = 0;
-                const p = chimeAudio.play();
-                if (p && p.catch) p.catch(() => { chimeBusy = false; playChimeWebAudio(); });
-                return;
-            }
-            playChimeWebAudio();
-        }
-
-        // ===== Success overlay (checkmark + bounce) =====
-        let successTimer = null;
-
-        function showSuccessOverlay(name, shift, pending) {
-            const overlay = document.getElementById('successOverlay');
-            document.getElementById('successName').textContent = name;
-            document.getElementById('successShift').textContent = (shift ? `${shift} SHIFT` : '') + (pending ? ' \u00b7 SYNC PENDING' : '');
-            overlay.classList.remove('show');
-            void overlay.offsetWidth; // restart animations
-            overlay.classList.add('show');
-            clearTimeout(successTimer);
-            successTimer = setTimeout(hideSuccessOverlay, 2000);
-        }
-
-        function hideSuccessOverlay() {
-            clearTimeout(successTimer);
-            document.getElementById('successOverlay').classList.remove('show');
-        }
-
-        function triggerSuccessFeedback(name, shift, pending) {
-            showSuccessOverlay(name, shift, pending);
-            playSuccessChime();
-            if (navigator.vibrate) navigator.vibrate([12, 40, 18]); // light haptic on supported phones
-        }
-
-        // ===== Compact signature (much smaller than the raw canvas, still PNG) =====
-        function getCompactSignature() {
-            const src = document.getElementById('pad');
-            const scale = Math.min(1, 400 / src.width);
-            const c = document.createElement('canvas');
-            c.width = Math.max(1, Math.round(src.width * scale));
-            c.height = Math.max(1, Math.round(src.height * scale));
-            const ctx = c.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, c.width, c.height);
-            ctx.drawImage(src, 0, 0, c.width, c.height);
-            return c.toDataURL('image/png');
-        }
-
-        // ===== Offline retry queue =====
-        const SYNC_QUEUE_KEY = 'motorway_sync_queue';
-        let syncQueue = loadJSON(SYNC_QUEUE_KEY, []);
-        let syncing = false;
-
-        function saveSyncQueue() {
-            try {
-                localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(syncQueue));
-            } catch (err) {
-                console.warn('Could not persist sync queue:', err);
-            }
-            updateSyncBadge();
-        }
-
-        function enqueueSync(log) {
-            if (!syncQueue.some(q => q.id === log.id)) syncQueue.push(log);
-            saveSyncQueue();
-        }
-
-        async function sendToSheet(log) {
-            if (navigator.onLine === false) throw new Error('offline');
-            const ctrl = new AbortController();
-            const timer = setTimeout(() => ctrl.abort(), 15000);
-            try {
-                await fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(log),
-                    signal: ctrl.signal
-                });
-            } finally {
-                clearTimeout(timer);
-            }
-        }
-
-        async function flushQueue() {
-            if (syncing || syncQueue.length === 0) return;
-            syncing = true;
-            updateSyncBadge();
-            try {
-                while (syncQueue.length > 0) {
-                    await sendToSheet(syncQueue[0]);
-                    syncQueue.shift();
-                    saveSyncQueue();
-                }
-            } catch (err) {
-                /* still offline - try again later */
-            } finally {
-                syncing = false;
-                updateSyncBadge();
             }
         }
 
         function updateSyncBadge() {
             const badge = document.getElementById('syncBadge');
-            if (!badge) return;
-            const n = syncQueue.length;
-            badge.classList.toggle('hidden', n === 0);
-            const label = `${n} check-in${n === 1 ? '' : 's'}`;
-            badge.textContent = syncing ? `Syncing ${label}\u2026` : `${label} pending sync \u2014 tap to retry`;
-        }
-
-        window.addEventListener('online', flushQueue);
-        setInterval(flushQueue, 30000);
-        updateSyncBadge();
-        flushQueue();
-
-        // ===== Admin auto-lock after inactivity =====
-        const ADMIN_IDLE_MS = 5 * 60 * 1000;
-        let lastAdminActivity = Date.now();
-        ['pointerdown', 'keydown', 'input', 'scroll', 'touchstart'].forEach(ev =>
-            document.addEventListener(ev, () => { lastAdminActivity = Date.now(); }, true)
-        );
-
-        function checkAdminIdle() {
-            if (adminUnlocked && Date.now() - lastAdminActivity > ADMIN_IDLE_MS) {
-                switchView('checkin');
-                showAlert('Admin locked after 5 minutes of inactivity.', 'ok');
+            if (offlineQueue.length > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = `⚡ ${offlineQueue.length} check-in(s) pending sync to Google Sheet. Tap to sync now.`;
+            } else {
+                badge.classList.add('hidden');
             }
         }
-        setInterval(checkAdminIdle, 10000);
+        updateSyncBadge();
 
-        // Handle Form Submission & Google Sheets Sync
+        async function pushToGoogleSheet(logPayload) {
+            await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(logPayload)
+            });
+        }
+
+        async function flushQueue() {
+            if (!navigator.onLine || offlineQueue.length === 0) return;
+            const toSync = [...offlineQueue];
+            for (const item of toSync) {
+                try {
+                    await pushToGoogleSheet(item);
+                    offlineQueue = offlineQueue.filter(q => q.id !== item.id);
+                    localStorage.setItem('motorway_offline_queue', JSON.stringify(offlineQueue));
+                    updateSyncBadge();
+                } catch (e) {
+                    console.error("Queue item sync error:", e);
+                    break;
+                }
+            }
+        }
+        window.addEventListener('online', flushQueue);
+
+        let successTimer = null;
+        function showSuccessOverlay(name, shift) {
+            document.getElementById('successName').textContent = name;
+            document.getElementById('successShift').textContent = (shift === 'DAY' ? '☀️ DAY SHIFT' : '🌙 NIGHT SHIFT');
+            const ov = document.getElementById('successOverlay');
+            ov.classList.add('show');
+            clearTimeout(successTimer);
+            successTimer = setTimeout(hideSuccessOverlay, 2400);
+        }
+        function hideSuccessOverlay() {
+            document.getElementById('successOverlay').classList.remove('show');
+        }
+
         async function handleCheckIn(e) {
             e.preventDefault();
-            unlockAudio();
             const name = document.getElementById('staffSelect').value;
             const shift = document.getElementById('shiftSelect').value;
-            const pickedDate = document.getElementById('attendanceDate').value;
+            const date = document.getElementById('attendanceDate').value;
+            const dayOfWeek = getDayOfWeekName(date);
 
             if (!name) {
                 showAlert("Please select your name from roster.", "err");
                 return;
             }
             if (!shift) {
-                showAlert("Please choose your shift.", "err");
-                return;
-            }
-            if (!adminUnlocked && pickedDate !== todayStr()) {
-                applyDateLock();
-                showAlert("Check-in is only allowed for today's date.", "err");
-                return;
-            }
-
-            // A night shift checked in after midnight is logged against the day it started
-            const date = getEffectiveShiftDate(pickedDate, shift);
-            const dayOfWeek = getDayOfWeekName(date);
-
-            if (attendanceLogs.some(l => l.name === name && l.date === date && l.shift === shift)) {
-                showAlert(`${name} has already checked in for the ${shift} shift on ${date}.`, "err");
+                showAlert("Please choose your shift (Day or Night).", "err");
                 return;
             }
             if (signaturePad.isEmpty()) {
@@ -1249,7 +1003,18 @@
                 return;
             }
 
-            const sigDataUrl = getCompactSignature();
+            const existingIndex = attendanceLogs.findIndex(l => l.name === name && l.date === date && l.shift === shift);
+            if (existingIndex !== -1) {
+                const prevTime = attendanceLogs[existingIndex].time;
+                const confirmRe = confirm(`${name} has already checked in for today's ${shift} shift at ${prevTime}.\n\nDo you want to re-submit check-in?`);
+                if (!confirmRe) return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Submitting...`;
+
+            const sigDataUrl = signaturePad.toDataURL();
             const now = new Date();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -1263,36 +1028,35 @@
                 signature: sigDataUrl
             };
 
-            // Save locally backup
             attendanceLogs.unshift(newLog);
-            saveLogs();
+            localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
 
-            // Send to Google Sheets; if that fails, queue it for automatic retry
-            showAlert(`Sending check-in for ${name}...`, "ok");
             let synced = false;
-            try {
-                await sendToSheet(newLog);
-                synced = true;
-            } catch (err) {
-                console.warn("Sheet sync failed, queued for retry:", err);
-                enqueueSync(newLog);
+            if (navigator.onLine) {
+                try {
+                    await pushToGoogleSheet(newLog);
+                    synced = true;
+                } catch (err) {
+                    console.error("Sheet sync error:", err);
+                }
             }
 
-            if (synced) {
-                showAlert(`Thank you, ${name}. Checked in & synced to Google Sheet!`, "ok");
-                triggerSuccessFeedback(name, shift, false);
-                flushQueue();
-            } else {
-                showAlert(`Thank you, ${name}. Checked in - saved on this phone and will sync automatically.`, "ok");
-                triggerSuccessFeedback(name, shift, true);
+            if (!synced) {
+                offlineQueue.push(newLog);
+                localStorage.setItem('motorway_offline_queue', JSON.stringify(offlineQueue));
+                updateSyncBadge();
             }
 
-            // Reset form
             document.getElementById('checkinForm').reset();
             setShift('');
-            document.getElementById('attendanceDate').value = todayStr();
+            document.getElementById('attendanceDate').valueAsDate = new Date();
             updateSelectedDayDisplay();
             signaturePad.clear();
+
+            btn.disabled = false;
+            btn.innerHTML = `<span>Confirm & Submit Check-In</span>`;
+
+            showSuccessOverlay(name, shift);
         }
 
         function showAlert(msg, type) {
@@ -1302,12 +1066,11 @@
                 : 'bg-rose-50 text-rose-800 border-rose-200';
             box.innerHTML = `<div class="p-3.5 mb-5 border rounded-2xl font-medium text-xs shadow-sm flex items-center gap-2 ${cls}">
                 <div class="w-2 h-2 rounded-full ${type === 'ok' ? 'bg-emerald-500' : 'bg-rose-500'}"></div>
-                ${esc(msg)}
+                ${msg}
             </div>`;
             setTimeout(() => { box.innerHTML = ''; }, 4500);
         }
 
-        // Add New Staff Member
         function addStaff() {
             const input = document.getElementById('newStaffInput');
             const val = input.value.trim();
@@ -1318,9 +1081,10 @@
                 return;
             }
 
-            staffList.push(val);
-            removedStaff = removedStaff.filter(n => n.toLowerCase() !== val.toLowerCase());
+            removedStaff = removedStaff.filter(r => r.toLowerCase() !== val.toLowerCase());
             localStorage.setItem('motorway_removed_staff', JSON.stringify(removedStaff));
+
+            staffList.push(val);
             staffList.sort((a, b) => a.localeCompare(b));
             localStorage.setItem('motorway_staff', JSON.stringify(staffList));
             input.value = '';
@@ -1328,7 +1092,6 @@
             renderAdminData();
         }
 
-        // Remove Staff Member
         function removeStaff(name) {
             if (confirm(`Remove ${name} from roster?`)) {
                 staffList = staffList.filter(s => s !== name);
@@ -1340,45 +1103,22 @@
             }
         }
 
-        // Apple-style empty states
-        const EMPTY_ICONS = {
-            users: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.13a4 4 0 00-6 0M12 12a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm7 7a6 6 0 00-14 0"></path></svg>',
-            search: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg>',
-            clipboard: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 8l2 2 4-4"></path></svg>'
-        };
-
-        function emptyState(cols, icon, title, subtitle) {
-            return `<tr><td colspan="${cols}" class="py-10 px-4 text-center">
-                <div class="mx-auto mb-3 w-14 h-14 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-400">${EMPTY_ICONS[icon]}</div>
-                <div class="text-sm font-semibold text-slate-700 tracking-tight">${title}</div>
-                <div class="text-xs text-slate-400 mt-1">${subtitle}</div>
-            </td></tr>`;
-        }
-
-        // Render Admin Panel Data
-        // Escape text before inserting into HTML (blocks broken markup / injection)
-        function esc(v) {
-            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        }
-
         function renderAdminData() {
-            // Roster Table
+            const staffTerm = (document.getElementById('staffSearch')?.value || '').toLowerCase();
+            const logTerm = (document.getElementById('logSearch')?.value || '').toLowerCase();
+
             const staffTbody = document.getElementById('adminStaffTable');
-            const staffQ = (document.getElementById('staffSearch')?.value || '').trim().toLowerCase();
-            const visibleStaff = staffList.filter(s => s.toLowerCase().includes(staffQ));
-            staffTbody.innerHTML = visibleStaff.map(s => `
-                <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                    <td class="p-2.5 font-medium text-slate-800">${esc(s)}</td>
+            const filteredStaff = staffList.filter(s => s.toLowerCase().includes(staffTerm));
+            staffTbody.innerHTML = filteredStaff.map(s => `
+                <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                    <td class="p-2.5 font-medium">${s}</td>
                     <td class="p-2.5 text-right">
-                        <button data-name="${esc(s)}" onclick="removeStaff(this.dataset.name)" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
+                        <button onclick="removeStaff('${s}')" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
                     </td>
                 </tr>
-            `).join('') || (staffQ
-                ? emptyState(2, 'search', 'No Results', 'No staff match your search.')
-                : emptyState(2, 'users', 'No Staff Yet', 'Add a name above to build your roster.'));
+            `).join('') || `<tr><td colspan="2" class="p-3 opacity-60">No staff found matching query.</td></tr>`;
 
-            // Summary Stats
-            const stats = Object.create(null);
+            let stats = {};
             staffList.forEach(s => stats[s] = { dayShifts: 0, nightShifts: 0, uniqueDays: new Set(), total: 0 });
 
             attendanceLogs.forEach(log => {
@@ -1391,66 +1131,54 @@
 
             const summaryTbody = document.getElementById('summaryTableBody');
             summaryTbody.innerHTML = Object.keys(stats).map(name => `
-                <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                    <td class="p-2.5 font-medium text-slate-800">${esc(name)}</td>
-                    <td class="p-2.5 text-amber-600 font-semibold">${stats[name].dayShifts}</td>
-                    <td class="p-2.5 text-indigo-600 font-semibold">${stats[name].nightShifts}</td>
-                    <td class="p-2.5 text-blue-600 font-semibold">${stats[name].uniqueDays.size}</td>
-                    <td class="p-2.5 font-bold text-slate-900">${stats[name].total}</td>
+                <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                    <td class="p-2.5 font-medium">${name}</td>
+                    <td class="p-2.5 text-amber-500 font-semibold">${stats[name].dayShifts}</td>
+                    <td class="p-2.5 text-indigo-400 font-semibold">${stats[name].nightShifts}</td>
+                    <td class="p-2.5 text-blue-500 font-semibold">${stats[name].uniqueDays.size}</td>
+                    <td class="p-2.5 font-bold">${stats[name].total}</td>
                 </tr>
             `).join('');
 
-            // Logs Table
-            const logsTbody = document.getElementById('logsTableBody');
-            const logQ = (document.getElementById('logSearch')?.value || '').trim().toLowerCase();
-            const visibleLogs = attendanceLogs.filter(r =>
-                !logQ || [r.name, r.dayOfWeek, r.shift, r.date].join(' ').toLowerCase().includes(logQ)
-            );
-            document.getElementById('totalLogsCount').textContent = logQ
-                ? `${visibleLogs.length} of ${attendanceLogs.length}`
-                : attendanceLogs.length;
-            logsTbody.innerHTML = visibleLogs.map(r => {
+            document.getElementById('totalLogsCount').textContent = attendanceLogs.length;
+
+            const filteredLogs = attendanceLogs.filter(r => {
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
-                const sigDisplay = (r.signature && /^data:image\//.test(r.signature))
-                    ? `<img src="${esc(r.signature)}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">`
-                    : '<span class="text-[10px] text-slate-400">&mdash;</span>';
+                const haystack = `${r.name} ${dayName} ${r.shift} ${r.date} ${r.time}`.toLowerCase();
+                return haystack.includes(logTerm);
+            });
+
+            const logsTbody = document.getElementById('logsTableBody');
+            logsTbody.innerHTML = filteredLogs.map(r => {
+                const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
+                const sigDisplay = r.signature ? `<img src="${r.signature}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">` : '<span class="text-[10px] opacity-50">Imported</span>';
                 return `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                        <td class="p-2.5 font-medium text-slate-800">${esc(r.name)}</td>
-                        <td class="p-2.5 font-semibold text-slate-600">${esc(dayName)}</td>
+                    <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                        <td class="p-2.5 font-medium">${r.name}</td>
+                        <td class="p-2.5 font-semibold opacity-80">${dayName}</td>
                         <td class="p-2.5">
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${r.shift === 'DAY' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'}">
-                                ${esc(r.shift || 'DAY')}
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${r.shift === 'DAY' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'}">
+                                ${r.shift || 'DAY'}
                             </span>
                         </td>
-                        <td class="p-2.5 text-slate-600">${esc(r.date)}</td>
-                        <td class="p-2.5 text-slate-600">${esc(r.time)}</td>
+                        <td class="p-2.5 opacity-80">${r.date}</td>
+                        <td class="p-2.5 opacity-80">${r.time}</td>
                         <td class="p-2.5">${sigDisplay}</td>
                     </tr>
                 `;
-            }).join('') || (logQ
-                ? emptyState(6, 'search', 'No Results', 'No check-ins match your search.')
-                : emptyState(6, 'clipboard', 'No Check-Ins Yet', 'Attendance records will appear here.'));
+            }).join('') || `<tr><td colspan="6" class="p-4 opacity-60 text-center">No attendance records found matching query.</td></tr>`;
         }
 
-        // CSV cell: always quoted; cells starting with = + - @ are neutralised so Excel won't run them
-        function csvCell(v) {
-            let t = String(v ?? '');
-            if (/^[=+\-@]/.test(t)) t = "'" + t;
-            return '"' + t.replace(/"/g, '""') + '"';
-        }
-
-        // CSV Exporter
         function exportToCSV() {
             if (attendanceLogs.length === 0) {
                 alert("No records to export.");
                 return;
             }
 
-            let csv = "Name,Day of Week,Shift,Date,Time\n";
+            let csv = "\uFEFFName,Day of Week,Shift,Date,Time\n";
             attendanceLogs.forEach(r => {
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
-                csv += [r.name, dayName, r.shift || 'DAY', r.date, r.time].map(csvCell).join(',') + '\n';
+                csv += `"${r.name}","${dayName}","${r.shift || 'DAY'}","${r.date}","${r.time}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1460,7 +1188,6 @@
             link.click();
         }
 
-        // CSV Importer
         function importCSV(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1502,7 +1229,7 @@
                     }
                 }
 
-                saveLogs();
+                localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
                 renderAdminData();
                 alert(`Successfully imported ${addedCount} new records!`);
                 e.target.value = '';
@@ -1510,13 +1237,15 @@
             reader.readAsText(file);
         }
 
-        // Clear Local Logs
         function clearAllLogs() {
             if (confirm("Are you sure you want to clear all archived records? Make sure you have exported your Master CSV first!")) {
                 let doubleCheck = prompt("Type 'DELETE' to confirm clearing all data:");
                 if (doubleCheck === "DELETE") {
                     attendanceLogs = [];
-                    saveLogs();
+                    offlineQueue = [];
+                    localStorage.setItem('motorway_logs', JSON.stringify(attendanceLogs));
+                    localStorage.setItem('motorway_offline_queue', JSON.stringify(offlineQueue));
+                    updateSyncBadge();
                     renderAdminData();
                     alert("Log archive cleared.");
                 }
