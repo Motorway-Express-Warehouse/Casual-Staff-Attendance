@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="apple">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -149,7 +149,7 @@
         .pull-cord-assembly {
             position: absolute;
             top: 0;
-            right: 3rem;
+            right: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -157,11 +157,12 @@
             z-index: 50;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            touch-action: manipulation;
         }
 
         .cord-string {
             width: 3px;
-            height: 38px;
+            height: 32px;
             background: linear-gradient(to right, #94a3b8, #cbd5e1, #64748b);
             box-shadow: 1px 0 3px rgba(0,0,0,0.15);
             transform-origin: top center;
@@ -169,8 +170,8 @@
         }
 
         .cord-handle {
-            width: 16px;
-            height: 26px;
+            width: 14px;
+            height: 24px;
             border-radius: 9999px;
             background: linear-gradient(135deg, #e2e8f0, #94a3b8);
             box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 2px 3px rgba(255,255,255,0.8);
@@ -184,17 +185,17 @@
         }
 
         .pull-cord-assembly:active .cord-string {
-            height: 58px;
+            height: 50px;
         }
 
         .pull-cord-assembly:active .cord-handle {
-            transform: translateY(20px) scale(0.95);
+            transform: translateY(16px) scale(0.95);
         }
 
         .cord-tooltip {
             position: absolute;
-            top: 72px;
-            right: -32px;
+            top: 64px;
+            right: -28px;
             background: rgba(15, 23, 42, 0.9);
             color: #ffffff;
             font-size: 10px;
@@ -426,7 +427,7 @@
 </head>
 <body class="min-h-screen antialiased relative selection:bg-blue-500 selection:text-white pb-12">
 
-    <!-- ORIGINAL INTRO SPLASH SCREEN (UNTOUCHED PREVIOUS DESIGN) -->
+    <!-- ORIGINAL INTRO SPLASH SCREEN (UNTOUCHED) -->
     <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000 overflow-hidden">
         <div class="absolute inset-0 z-0">
             <img src="image_150cbd.jpg" alt="Hisense Warehouse" class="w-full h-full object-cover opacity-75">
@@ -463,29 +464,31 @@
     <!-- MAIN APP CONTAINER -->
     <main id="mainContainer" class="max-w-4xl mx-auto mt-4 md:mt-8 px-4 opacity-0 transition-all duration-1000 ease-out relative">
         
-        <!-- OVERHEAD PULL-CORD THEME TOGGLE -->
-        <div class="pull-cord-assembly" onclick="cycleTheme()" title="Pull or click to change theme">
-            <div class="cord-string"></div>
-            <div class="cord-handle"></div>
-            <div id="cordTooltip" class="cord-tooltip">Theme: Apple Clean</div>
-        </div>
+        <!-- HEADER & NAVIGATION BAR WITH RESPONSIVE PADDING & LAYOUT -->
+        <header class="theme-header rounded-3xl p-4 md:p-6 pr-14 md:pr-20 shadow-[0_20px_50px_rgba(0,0,0,0.06)] mb-6 sticky top-4 z-40 relative">
+            
+            <!-- OVERHEAD PULL-CORD THEME TOGGLE -->
+            <div class="pull-cord-assembly" onclick="cycleTheme()" title="Pull or click to change theme">
+                <div class="cord-string"></div>
+                <div class="cord-handle"></div>
+                <div id="cordTooltip" class="cord-tooltip">Theme: Apple Clean</div>
+            </div>
 
-        <!-- HEADER & NAVIGATION BAR -->
-        <header class="theme-header rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] mb-6 sticky top-4 z-40">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
                         H
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-tight">Motorway Express</h1>
-                        <p class="text-xs opacity-70 font-medium">Hisense Warehouse • Casual Staff Attendance</p>
+                        <h1 class="text-lg md:text-xl font-bold tracking-tight">Motorway Express</h1>
+                        <p class="text-xs opacity-70 font-medium">Hisense Warehouse • Attendance Portal</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end pr-16 md:pr-0">
+                <!-- Responsive Control Group (Date Picker + View Toggle) -->
+                <div class="flex flex-wrap items-center gap-2.5 w-full xl:w-auto justify-start xl:justify-end">
                     <div class="relative">
-                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple theme-input border font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer">
+                        <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple theme-input border font-semibold text-xs rounded-2xl px-3 py-2.5 shadow-sm focus:outline-none cursor-pointer">
                     </div>
                     
                     <div id="navSwitch" class="nav-seg" data-value="checkin" role="tablist">
@@ -542,7 +545,7 @@
                                 Day Shift
                             </button>
                             <button type="button" class="shift-option" data-shift="NIGHT" role="radio" aria-checked="false" onclick="setShift('NIGHT')">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
                                 Night Shift
                             </button>
                         </div>
@@ -684,7 +687,6 @@
     <script>
         const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHIF2WzZGnfp7fB1JX1WoxeGPKc2LrJ9sKObPZdj8vYhge1ehSLiGgrRSSeHWN5YCJHQ/exec";
 
-        // ================= 5 LIGHT THEMES CYCLER =================
         const themes = ['apple', 'mint', 'peach', 'lavender', 'ocean'];
         const themeNames = {
             apple: 'Apple Clean',
@@ -1082,7 +1084,7 @@
         function removeStaff(name) {
             if (confirm(`Remove ${name} from roster?`)) {
                 staffList = staffList.filter(s => s !== name);
-                if (!removedStaff.includes(name)) removedStaff.includes(name) || removedStaff.push(name);
+                if (!removedStaff.includes(name)) removedStaff.push(name);
                 localStorage.setItem('motorway_removed_staff', JSON.stringify(removedStaff));
                 localStorage.setItem('motorway_staff', JSON.stringify(staffList));
                 populateDropdown();
