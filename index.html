@@ -41,12 +41,8 @@
         }
 
         @keyframes driveFastAnimation {
-            0% {
-                left: -20%;
-            }
-            100% {
-                left: 110%;
-            }
+            0% { left: -20%; }
+            100% { left: 110%; }
         }
 
         .truck-track {
@@ -66,38 +62,60 @@
             animation: driveFastAnimation 1.2s linear infinite;
         }
 
-        /* ================= THEME STYLING & VARIABLES ================= */
-        :root[data-theme="light"] {
-            --bg-gradient: linear-gradient(to bottom right, #f1f5f9, #f8fafc, rgba(59, 130, 246, 0.04));
-            --text-main: #1e293b;
-            --card-bg: rgba(255, 255, 255, 0.88);
-            --card-border: rgba(229, 231, 235, 0.8);
-            --header-bg: rgba(255, 255, 255, 0.75);
-            --input-bg: rgba(255, 255, 255, 0.9);
+        /* ================= 5 CATCHY LIGHT THEMES ================= */
+        :root[data-theme="apple"] {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            --text-main: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(226, 232, 240, 0.9);
+            --header-bg: rgba(255, 255, 255, 0.78);
+            --input-bg: rgba(255, 255, 255, 0.95);
             --input-border: #cbd5e1;
-            --table-header: #f1f5f9;
+            --accent-color: #2563eb;
         }
 
-        :root[data-theme="dark"] {
-            --bg-gradient: linear-gradient(to bottom right, #090d16, #0f172a, #020617);
-            --text-main: #f8fafc;
-            --card-bg: rgba(15, 23, 42, 0.85);
-            --card-border: rgba(51, 65, 85, 0.7);
-            --header-bg: rgba(15, 23, 42, 0.75);
-            --input-bg: rgba(30, 41, 59, 0.9);
-            --input-border: #475569;
-            --table-header: #1e293b;
+        :root[data-theme="mint"] {
+            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #d1fae5 100%);
+            --text-main: #064e3b;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(167, 243, 208, 0.9);
+            --header-bg: rgba(255, 255, 255, 0.82);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: #6ee7b7;
+            --accent-color: #059669;
         }
 
-        :root[data-theme="gold"] {
-            --bg-gradient: linear-gradient(to bottom right, #18130d, #261c12, #110d09);
-            --text-main: #fef3c7;
-            --card-bg: rgba(38, 28, 18, 0.88);
-            --card-border: rgba(217, 119, 6, 0.35);
-            --header-bg: rgba(38, 28, 18, 0.8);
-            --input-bg: rgba(54, 40, 26, 0.9);
-            --input-border: #b45309;
-            --table-header: #2d2114;
+        :root[data-theme="peach"] {
+            --bg-gradient: linear-gradient(135deg, #fffbeb 0%, #fff7ed 50%, #fed7aa 100%);
+            --text-main: #7c2d12;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(253, 186, 116, 0.8);
+            --header-bg: rgba(255, 255, 255, 0.82);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: #fdba74;
+            --accent-color: #ea580c;
+        }
+
+        :root[data-theme="lavender"] {
+            --bg-gradient: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%);
+            --text-main: #581c87;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(216, 180, 254, 0.8);
+            --header-bg: rgba(255, 255, 255, 0.82);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: #d8b4fe;
+            --accent-color: #7c3aed;
+        }
+
+        :root[data-theme="ocean"] {
+            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            --text-main: #0c4a6e;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(125, 211, 252, 0.8);
+            --header-bg: rgba(255, 255, 255, 0.82);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: #7dd3fc;
+            --accent-color: #0284c7;
         }
 
         body {
@@ -111,6 +129,7 @@
             -webkit-backdrop-filter: blur(25px) saturate(190%);
             border: 1px solid var(--card-border);
             color: var(--text-main);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
         }
 
         .theme-header {
@@ -172,11 +191,10 @@
             transform: translateY(20px) scale(0.95);
         }
 
-        /* Theme Label Tooltip */
         .cord-tooltip {
             position: absolute;
             top: 72px;
-            right: -24px;
+            right: -32px;
             background: rgba(15, 23, 42, 0.9);
             color: #ffffff;
             font-size: 10px;
@@ -213,7 +231,7 @@
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .input-apple:focus {
-            border-color: #2563eb;
+            border-color: var(--accent-color);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
@@ -251,9 +269,9 @@
             grid-template-columns: 1fr 1fr;
             padding: 4px;
             border-radius: 9999px;
-            background: rgba(148, 163, 184, 0.22);
-            border: 1px solid rgba(203, 213, 225, 0.8);
-            box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06);
+            background: rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -265,24 +283,19 @@
             width: calc(50% - 4px);
             border-radius: 9999px;
             background: #ffffff;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14), 0 1px 2px rgba(15, 23, 42, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
             opacity: 0;
             transform: translateX(0) scale(0.92);
-            transition:
-                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.2s ease,
-                background 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
             pointer-events: none;
         }
         .shift-switch[data-value="DAY"] .shift-thumb {
             opacity: 1;
             transform: translateX(0) scale(1);
-            background: linear-gradient(135deg, #fffbeb, #fef3c7);
         }
         .shift-switch[data-value="NIGHT"] .shift-thumb {
             opacity: 1;
             transform: translateX(100%) scale(1);
-            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
         }
         .shift-option {
             position: relative;
@@ -297,27 +310,22 @@
             font-weight: 700;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #64748b;
+            opacity: 0.7;
             background: transparent;
             border: none;
             cursor: pointer;
-            transition: color 0.25s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .shift-option:active {
-            transform: scale(0.96);
+            transition: opacity 0.25s ease;
         }
         .shift-option svg {
             width: 16px;
             height: 16px;
         }
-        .shift-option[data-shift="DAY"].active {
-            color: #b45309;
-        }
-        .shift-option[data-shift="NIGHT"].active {
-            color: #4338ca;
+        .shift-switch[data-value="DAY"] .shift-option[data-shift="DAY"],
+        .shift-switch[data-value="NIGHT"] .shift-option[data-shift="NIGHT"] {
+            opacity: 1;
         }
 
-        /* SUCCESS OVERLAY (CHECKMARK + BOUNCE) */
+        /* SUCCESS OVERLAY */
         .success-overlay {
             position: fixed;
             inset: 0;
@@ -325,7 +333,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(15, 23, 42, 0.35);
+            background: rgba(15, 23, 42, 0.3);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             opacity: 0;
@@ -337,12 +345,12 @@
             pointer-events: auto;
         }
         .success-card {
-            background: rgba(255, 255, 255, 0.93);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 28px;
             padding: 28px 40px;
             text-align: center;
-            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
             transform: scale(0.8);
         }
         .success-overlay.show .success-card {
@@ -372,17 +380,15 @@
             to { stroke-dashoffset: 0; }
         }
 
-        /* APPLE SEGMENTED NAV (CHECK-IN / ADMIN) */
+        /* APPLE SEGMENTED NAV */
         .nav-seg {
             position: relative;
             display: grid;
             grid-template-columns: 1fr 1fr;
             padding: 4px;
             border-radius: 9999px;
-            background: rgba(148, 163, 184, 0.22);
-            border: 1px solid rgba(203, 213, 225, 0.8);
-            box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06);
-            -webkit-tap-highlight-color: transparent;
+            background: rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             user-select: none;
         }
         .nav-thumb {
@@ -393,7 +399,7 @@
             width: calc(50% - 4px);
             border-radius: 9999px;
             background: #ffffff;
-            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.14), 0 1px 2px rgba(15, 23, 42, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
             transform: translateX(0);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
@@ -410,40 +416,33 @@
             background: transparent;
             font-size: 12px;
             font-weight: 600;
-            color: #64748b;
+            opacity: 0.7;
             cursor: pointer;
             white-space: nowrap;
-            transition: color 0.25s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.25s ease;
         }
-        .nav-opt:active { transform: scale(0.96); }
-        .nav-opt.active { color: #2563eb; }
+        .nav-opt.active { opacity: 1; font-weight: 700; }
     </style>
 </head>
 <body class="min-h-screen antialiased relative selection:bg-blue-500 selection:text-white pb-12">
 
     <!-- ORIGINAL INTRO SPLASH SCREEN (UNTOUCHED PREVIOUS DESIGN) -->
     <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000 overflow-hidden">
-        <!-- Background Image & Lighter Overlay -->
         <div class="absolute inset-0 z-0">
             <img src="image_150cbd.jpg" alt="Hisense Warehouse" class="w-full h-full object-cover opacity-75">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
         </div>
 
-        <!-- Centered Branding Content -->
         <div class="relative z-10 text-center px-6 select-none flex flex-col items-center">
-            <!-- Glowing Hisense Title -->
             <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight animate-hisense-glow">
                 Hisense
             </h1>
             <div class="h-1.5 w-36 bg-blue-500 mx-auto my-4 rounded-full shadow-lg"></div>
-            
-            <!-- Warehouse Subtitle -->
             <p class="text-xl md:text-3xl font-extrabold text-blue-300 tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                 Motorway Express Warehouse
             </p>
         </div>
 
-        <!-- Fast Moving Truck Track -->
         <div class="truck-track z-20">
             <div class="fast-truck">
                 <svg class="w-16 h-16 md:w-20 md:h-20 text-blue-300 drop-shadow-[0_0_12px_rgba(59,130,246,0.9)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -453,7 +452,6 @@
             </div>
         </div>
         
-        <!-- Loading Progress Indicator -->
         <div class="absolute bottom-6 z-10 flex flex-col items-center gap-2">
             <span class="text-xs uppercase tracking-widest text-gray-200 font-semibold drop-shadow">Initializing System...</span>
             <div class="w-36 h-1 bg-gray-700/80 rounded-full overflow-hidden">
@@ -462,14 +460,14 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER WITH MODERN APPLE-LIKE UI -->
+    <!-- MAIN APP CONTAINER -->
     <main id="mainContainer" class="max-w-4xl mx-auto mt-4 md:mt-8 px-4 opacity-0 transition-all duration-1000 ease-out relative">
         
         <!-- OVERHEAD PULL-CORD THEME TOGGLE -->
         <div class="pull-cord-assembly" onclick="cycleTheme()" title="Pull or click to change theme">
             <div class="cord-string"></div>
             <div class="cord-handle"></div>
-            <div id="cordTooltip" class="cord-tooltip">Theme: Light</div>
+            <div id="cordTooltip" class="cord-tooltip">Theme: Apple Clean</div>
         </div>
 
         <!-- HEADER & NAVIGATION BAR -->
@@ -486,12 +484,10 @@
                 </div>
 
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end pr-16 md:pr-0">
-                    <!-- Date Input -->
                     <div class="relative">
                         <input type="date" id="attendanceDate" onchange="updateSelectedDayDisplay()" class="input-apple theme-input border font-semibold text-xs rounded-2xl px-3.5 py-2.5 shadow-sm focus:outline-none cursor-pointer">
                     </div>
                     
-                    <!-- View Toggle Pill Segment Control -->
                     <div id="navSwitch" class="nav-seg" data-value="checkin" role="tablist">
                         <div class="nav-thumb"></div>
                         <button onclick="switchView('checkin')" id="navCheckin" class="nav-opt active" role="tab">Check-In</button>
@@ -503,20 +499,19 @@
 
         <!-- VIEW 1: CHECK-IN PAGE -->
         <div id="checkinView" class="view-transition view-visible">
-            <div class="theme-card rounded-3xl p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)]">
+            <div class="theme-card rounded-3xl p-6 md:p-8">
                 
-                <!-- Live Status Bar Card -->
-                <div class="bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50/80 border border-blue-100/80 rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm text-slate-800">
+                <div class="bg-black/5 border border-black/10 rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-blue-600 tracking-widest block">System Live</span>
-                            <div id="liveClock" class="text-2xl font-extrabold tracking-tight text-slate-900">--:--:--</div>
+                            <span class="text-[10px] uppercase font-bold tracking-widest block opacity-70">System Live</span>
+                            <div id="liveClock" class="text-2xl font-extrabold tracking-tight">--:--:--</div>
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="text-[10px] uppercase font-bold text-blue-600 tracking-widest block">Selected Date</span>
-                        <div id="liveDate" class="text-xs font-bold text-slate-700">-</div>
+                        <span class="text-[10px] uppercase font-bold tracking-widest block opacity-70">Selected Date</span>
+                        <div id="liveDate" class="text-xs font-bold">-</div>
                     </div>
                 </div>
 
@@ -525,7 +520,6 @@
                 <div id="alertBox"></div>
 
                 <form id="checkinForm" onsubmit="handleCheckIn(event)" class="space-y-5">
-                    <!-- Staff Dropdown -->
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-2 opacity-80" for="staffSelect">Select Your Name</label>
                         <div class="relative">
@@ -538,7 +532,6 @@
                         </div>
                     </div>
 
-                    <!-- Shift: Apple Segmented Capsule Switcher -->
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-2 opacity-80">Work Shift</label>
                         <input type="hidden" id="shiftSelect" value="">
@@ -555,13 +548,11 @@
                         </div>
                     </div>
 
-                    <!-- Auto Day Badge -->
-                    <div class="p-3.5 rounded-2xl border border-white/10 bg-black/5 flex justify-between items-center">
+                    <div class="p-3.5 rounded-2xl border border-black/10 bg-black/5 flex justify-between items-center">
                         <span class="text-xs font-semibold opacity-70">Check-In Day</span>
                         <span id="autoDayBadge" class="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-500/20">-</span>
                     </div>
 
-                    <!-- Signature Canvas -->
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-xs font-semibold uppercase tracking-wider opacity-80">Digital Signature</label>
@@ -571,12 +562,11 @@
                             <canvas id="pad" class="w-full h-36 touch-none rounded-xl cursor-crosshair"></canvas>
                         </div>
                         <div class="flex justify-between items-center mt-2.5">
-                            <button type="button" onclick="clearPad()" class="btn-apple px-3.5 py-1.5 text-xs font-semibold bg-slate-200/80 hover:bg-slate-300 text-slate-800 rounded-xl">Clear Canvas</button>
+                            <button type="button" onclick="clearPad()" class="btn-apple px-3.5 py-1.5 text-xs font-semibold bg-black/10 hover:bg-black/20 rounded-xl">Clear Canvas</button>
                             <span class="text-[11px] opacity-60">Sign with finger or stylus</span>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <button type="submit" id="submitBtn" class="btn-apple w-full py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
                         <span>Confirm & Submit Check-In</span>
                     </button>
@@ -587,7 +577,6 @@
         <!-- VIEW 2: ADMIN PANEL -->
         <div id="adminView" class="view-transition view-hidden space-y-6">
             
-            <!-- Admin Control Hub Header -->
             <div class="theme-card rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h3 class="text-lg font-bold">Admin Control Hub</h3>
@@ -609,13 +598,12 @@
                     <button onclick="clearAllLogs()" class="btn-apple bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm">
                         Clear Logs
                     </button>
-                    <button onclick="switchView('checkin')" class="btn-apple bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold px-3.5 py-2.5 rounded-xl">
+                    <button onclick="switchView('checkin')" class="btn-apple bg-black/10 hover:bg-black/20 text-xs font-semibold px-3.5 py-2.5 rounded-xl">
                         Close
                     </button>
                 </div>
             </div>
 
-            <!-- Staff Roster Card -->
             <div class="theme-card rounded-3xl p-6 shadow-sm">
                 <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Staff Roster Management</h3>
                 <div class="relative mb-3">
@@ -628,20 +616,19 @@
                         Add Staff
                     </button>
                 </div>
-                <div class="max-h-44 overflow-y-auto border border-white/10 rounded-2xl bg-black/5">
+                <div class="max-h-44 overflow-y-auto border border-black/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <tbody id="adminStaffTable"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Summary Card -->
             <div class="theme-card rounded-3xl p-6 shadow-sm">
                 <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Attendance Summary</h3>
-                <div class="overflow-x-auto border border-white/10 rounded-2xl bg-black/5">
+                <div class="overflow-x-auto border border-black/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-white/10 opacity-75">
+                            <tr class="border-b border-black/10 opacity-75">
                                 <th class="p-3 font-semibold">Name</th>
                                 <th class="p-3 font-semibold">Day Shifts</th>
                                 <th class="p-3 font-semibold">Night Shifts</th>
@@ -654,7 +641,6 @@
                 </div>
             </div>
 
-            <!-- All Logs Card -->
             <div class="theme-card rounded-3xl p-6 shadow-sm">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-bold uppercase tracking-wider">All Check-In Activity (<span id="totalLogsCount">0</span>)</h3>
@@ -663,10 +649,10 @@
                         <input type="search" id="logSearch" oninput="renderAdminData()" placeholder="Search logs..." class="input-apple theme-input w-40 md:w-60 border pl-9 pr-3 py-2 rounded-2xl text-xs focus:outline-none">
                     </div>
                 </div>
-                <div class="overflow-x-auto max-h-64 border border-white/10 rounded-2xl bg-black/5">
+                <div class="overflow-x-auto max-h-64 border border-black/10 rounded-2xl bg-black/5">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-white/10 opacity-75">
+                            <tr class="border-b border-black/10 opacity-75">
                                 <th class="p-3 font-semibold">Name</th>
                                 <th class="p-3 font-semibold">Day</th>
                                 <th class="p-3 font-semibold">Shift</th>
@@ -696,12 +682,17 @@
     </div>
 
     <script>
-        // Google Sheet Web App URL
         const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHIF2WzZGnfp7fB1JX1WoxeGPKc2LrJ9sKObPZdj8vYhge1ehSLiGgrRSSeHWN5YCJHQ/exec";
 
-        // ================= THEME CYCLER LOGIC =================
-        const themes = ['light', 'dark', 'gold'];
-        const themeNames = { light: 'Light Mode', dark: 'Midnight Slate', gold: 'Executive Gold' };
+        // ================= 5 LIGHT THEMES CYCLER =================
+        const themes = ['apple', 'mint', 'peach', 'lavender', 'ocean'];
+        const themeNames = {
+            apple: 'Apple Clean',
+            mint: 'Fresh Mint',
+            peach: 'Sunset Peach',
+            lavender: 'Lavender Twilight',
+            ocean: 'Sky Ocean'
+        };
 
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
@@ -710,16 +701,14 @@
         }
 
         function cycleTheme() {
-            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const current = document.documentElement.getAttribute('data-theme') || 'apple';
             const nextIdx = (themes.indexOf(current) + 1) % themes.length;
             applyTheme(themes[nextIdx]);
         }
 
-        // Initialize saved theme on load
-        const savedTheme = localStorage.getItem('motorway_theme') || 'light';
+        const savedTheme = localStorage.getItem('motorway_theme') || 'apple';
         applyTheme(savedTheme);
 
-        // Automatic Splash Screen Transition Timer (3 seconds)
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
@@ -736,7 +725,6 @@
             }, 3000);
         });
 
-        // Combined Staff Array
         const defaultStaff = [
             "Patrick Apawudza",
             "John Njoku",
@@ -794,7 +782,6 @@
             const opts = sw.querySelectorAll('.shift-option');
             opts.forEach(btn => {
                 const isMatch = btn.getAttribute('data-shift') === val;
-                btn.classList.toggle('active', isMatch);
                 btn.setAttribute('aria-checked', isMatch ? "true" : "false");
             });
         }
@@ -1095,7 +1082,7 @@
         function removeStaff(name) {
             if (confirm(`Remove ${name} from roster?`)) {
                 staffList = staffList.filter(s => s !== name);
-                if (!removedStaff.includes(name)) removedStaff.push(name);
+                if (!removedStaff.includes(name)) removedStaff.includes(name) || removedStaff.push(name);
                 localStorage.setItem('motorway_removed_staff', JSON.stringify(removedStaff));
                 localStorage.setItem('motorway_staff', JSON.stringify(staffList));
                 populateDropdown();
@@ -1110,7 +1097,7 @@
             const staffTbody = document.getElementById('adminStaffTable');
             const filteredStaff = staffList.filter(s => s.toLowerCase().includes(staffTerm));
             staffTbody.innerHTML = filteredStaff.map(s => `
-                <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                <tr class="border-b border-black/10 hover:bg-black/5 transition">
                     <td class="p-2.5 font-medium">${s}</td>
                     <td class="p-2.5 text-right">
                         <button onclick="removeStaff('${s}')" class="px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px] font-bold transition">Remove</button>
@@ -1131,11 +1118,11 @@
 
             const summaryTbody = document.getElementById('summaryTableBody');
             summaryTbody.innerHTML = Object.keys(stats).map(name => `
-                <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                <tr class="border-b border-black/10 hover:bg-black/5 transition">
                     <td class="p-2.5 font-medium">${name}</td>
-                    <td class="p-2.5 text-amber-500 font-semibold">${stats[name].dayShifts}</td>
-                    <td class="p-2.5 text-indigo-400 font-semibold">${stats[name].nightShifts}</td>
-                    <td class="p-2.5 text-blue-500 font-semibold">${stats[name].uniqueDays.size}</td>
+                    <td class="p-2.5 text-amber-600 font-semibold">${stats[name].dayShifts}</td>
+                    <td class="p-2.5 text-indigo-600 font-semibold">${stats[name].nightShifts}</td>
+                    <td class="p-2.5 text-blue-600 font-semibold">${stats[name].uniqueDays.size}</td>
                     <td class="p-2.5 font-bold">${stats[name].total}</td>
                 </tr>
             `).join('');
@@ -1153,11 +1140,11 @@
                 const dayName = r.dayOfWeek || getDayOfWeekName(r.date);
                 const sigDisplay = r.signature ? `<img src="${r.signature}" class="h-7 border bg-white rounded-lg p-0.5" alt="Sig">` : '<span class="text-[10px] opacity-50">Imported</span>';
                 return `
-                    <tr class="border-b border-white/10 hover:bg-black/5 transition">
+                    <tr class="border-b border-black/10 hover:bg-black/5 transition">
                         <td class="p-2.5 font-medium">${r.name}</td>
                         <td class="p-2.5 font-semibold opacity-80">${dayName}</td>
                         <td class="p-2.5">
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${r.shift === 'DAY' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'}">
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${r.shift === 'DAY' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'}">
                                 ${r.shift || 'DAY'}
                             </span>
                         </td>
